@@ -1,9 +1,10 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useId } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -40,6 +41,7 @@ interface ManageAmenityDialogProps {
 export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenityDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const formId = useId();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { title: "", description: "", details: "", icon: "Wifi" },
@@ -78,45 +80,45 @@ export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenit
         <DialogHeader>
           <DialogTitle>{amenity ? "Edit Amenity" : "Add New Amenity"}</DialogTitle>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col gap-4 min-h-0">
-            <ScrollArea className="flex-auto pr-6">
-              <div className="space-y-4">
-                <FormField control={form.control} name="title" render={({ field }) => (
-                    <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                )}/>
-                <FormField control={form.control} name="description" render={({ field }) => (
-                    <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                )}/>
-                <FormField control={form.control} name="details" render={({ field }) => (
-                    <FormItem><FormLabel>Details</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                )}/>
-                <FormField control={form.control} name="icon" render={({ field }) => (
-                    <FormItem><FormLabel>Icon</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger><SelectValue placeholder="Select an icon" /></SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {availableIcons.map(iconName => (
-                          <SelectItem key={iconName} value={iconName}>{iconName}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                    </FormItem>
-                )}/>
-              </div>
+        <div className="flex-grow overflow-hidden">
+            <ScrollArea className="h-full pr-6">
+                <Form {...form}>
+                <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField control={form.control} name="title" render={({ field }) => (
+                        <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                    )}/>
+                    <FormField control={form.control} name="description" render={({ field }) => (
+                        <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                    )}/>
+                    <FormField control={form.control} name="details" render={({ field }) => (
+                        <FormItem><FormLabel>Details</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                    )}/>
+                    <FormField control={form.control} name="icon" render={({ field }) => (
+                        <FormItem><FormLabel>Icon</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                            <SelectTrigger><SelectValue placeholder="Select an icon" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                            {availableIcons.map(iconName => (
+                            <SelectItem key={iconName} value={iconName}>{iconName}</SelectItem>
+                            ))}
+                        </SelectContent>
+                        </Select>
+                        <FormMessage />
+                        </FormItem>
+                    )}/>
+                </form>
+                </Form>
             </ScrollArea>
-            <DialogFooter className="flex-shrink-0 pt-4 border-t">
-              <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="animate-spin mr-2" />}
-                Save
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        </div>
+        <DialogFooter className="flex-shrink-0 pt-4 border-t">
+            <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
+            <Button type="submit" form={formId} disabled={loading}>
+            {loading && <Loader2 className="animate-spin mr-2" />}
+            Save
+            </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

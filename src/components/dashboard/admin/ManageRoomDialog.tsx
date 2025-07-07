@@ -1,9 +1,10 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import * as z from "zod";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useId } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -43,6 +44,7 @@ interface ManageRoomDialogProps {
 export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const formId = useId();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -97,10 +99,10 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
         <DialogHeader>
           <DialogTitle>{room ? "Edit Room" : "Add New Room"}</DialogTitle>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col gap-4 min-h-0">
-            <ScrollArea className="flex-auto pr-6">
-                <div className="space-y-4">
+        <div className="flex-grow overflow-hidden">
+            <ScrollArea className="h-full pr-6">
+                <Form {...form}>
+                <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                     <FormField control={form.control} name="name" render={({ field }) => (
                         <FormItem><FormLabel>Room Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                     )}/>
@@ -112,72 +114,72 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
                     )}/>
                     
                     <div className="space-y-2">
-                      <FormLabel>Images</FormLabel>
-                      <div className="space-y-2">
+                        <FormLabel>Images</FormLabel>
+                        <div className="space-y-2">
                         {fields.map((field, index) => (
-                          <div key={field.id} className="flex items-end gap-2 p-3 border rounded-lg bg-muted/50">
+                            <div key={field.id} className="flex items-end gap-2 p-3 border rounded-lg bg-muted/50">
                             <div className="flex-grow space-y-2">
-                              <FormField
+                                <FormField
                                 control={form.control}
                                 name={`images.${index}.url`}
                                 render={({ field }) => (
-                                  <FormItem>
+                                    <FormItem>
                                     <FormLabel className="text-xs font-normal">Image URL</FormLabel>
                                     <FormControl><Input {...field} placeholder="https://example.com/image.png" /></FormControl>
                                     <FormMessage />
-                                  </FormItem>
+                                    </FormItem>
                                 )}
-                              />
-                              <FormField
+                                />
+                                <FormField
                                 control={form.control}
                                 name={`images.${index}.hint`}
                                 render={({ field }) => (
-                                  <FormItem>
+                                    <FormItem>
                                     <FormLabel className="text-xs font-normal">Image AI Hint</FormLabel>
                                     <FormControl><Input {...field} placeholder="e.g. hotel room" /></FormControl>
                                     <FormMessage />
-                                  </FormItem>
+                                    </FormItem>
                                 )}
-                              />
+                                />
                             </div>
                             <Button
-                              type="button"
-                              variant="destructive"
-                              size="icon"
-                              onClick={() => remove(index)}
-                              disabled={fields.length <= 1}
+                                type="button"
+                                variant="destructive"
+                                size="icon"
+                                onClick={() => remove(index)}
+                                disabled={fields.length <= 1}
                             >
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Remove Image</span>
+                                <Trash2 className="h-4 w-4" />
+                                <span className="sr-only">Remove Image</span>
                             </Button>
-                          </div>
+                            </div>
                         ))}
-                      </div>
+                        </div>
 
-                      <Button
+                        <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         className="mt-2"
                         onClick={() => append({ url: "https://placehold.co/600x400.png", hint: "" })}
-                      >
+                        >
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Add Another Image
-                      </Button>
-                      <FormMessage>{form.formState.errors.images?.root?.message}</FormMessage>
+                        </Button>
+                        <FormMessage>{form.formState.errors.images?.root?.message}</FormMessage>
                     </div>
-                </div>
+                </form>
+                </Form>
             </ScrollArea>
+        </div>
 
-            <DialogFooter className="flex-shrink-0 pt-4 border-t">
-              <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={loading}>
-                {loading && <Loader2 className="animate-spin mr-2" />}
-                Save
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        <DialogFooter className="flex-shrink-0 pt-4 border-t">
+            <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
+            <Button type="submit" form={formId} disabled={loading}>
+            {loading && <Loader2 className="animate-spin mr-2" />}
+            Save
+            </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
