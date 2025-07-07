@@ -2,19 +2,20 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { DollarSign, BedDouble, Sparkles, CalendarCheck, MessageSquare } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getRooms, getAmenities, getBookings, getMessagesForAdmin } from "@/lib/firebase-service";
+import { getRooms, getAmenities, getBookings, getMessagesForAdmin, getAdminNotifications } from "@/lib/firebase-service";
 import { RoomsTab } from "@/components/dashboard/admin/RoomsTab";
 import { AmenitiesTab } from "@/components/dashboard/admin/AmenitiesTab";
 import { BookingsTab } from "@/components/dashboard/admin/BookingsTab";
 import { MessagesTab } from "@/components/dashboard/admin/MessagesTab";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { RecentActivityFeed } from "@/components/dashboard/admin/RecentActivityFeed";
 
 export default async function AdminDashboardPage() {
-    const [rooms, amenities, bookings, messages] = await Promise.all([
+    const [rooms, amenities, bookings, messages, adminNotifications] = await Promise.all([
         getRooms(),
         getAmenities(),
         getBookings(),
         getMessagesForAdmin(),
+        getAdminNotifications(),
     ]);
 
     const confirmedBookings = bookings.filter(b => b.status === 'Confirmed');
@@ -71,15 +72,7 @@ export default async function AdminDashboardPage() {
                             <RevenueChart bookings={bookings} />
                         </div>
                         <div className="lg:col-span-3">
-                           <Card className="h-full">
-                               <CardHeader>
-                                   <CardTitle>Recent Activity</CardTitle>
-                                   <CardDescription>A log of recent admin actions and site events.</CardDescription>
-                               </CardHeader>
-                               <CardContent>
-                                   <p className="text-muted-foreground text-center pt-8">Activity feed coming soon.</p>
-                               </CardContent>
-                           </Card>
+                           <RecentActivityFeed activities={adminNotifications} />
                         </div>
                     </div>
                 </TabsContent>

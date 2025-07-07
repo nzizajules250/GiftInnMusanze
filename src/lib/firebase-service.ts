@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, getDocs, query, where, addDoc, doc, getDoc, updateDoc, deleteDoc, setDoc, Timestamp, writeBatch } from 'firebase/firestore';
+import { collection, getDocs, query, where, addDoc, doc, getDoc, updateDoc, deleteDoc, setDoc, Timestamp, writeBatch, orderBy, limit } from 'firebase/firestore';
 import type { Room, Booking, Amenity, Attraction, Admin, SessionPayload, ContactMessage, Notification } from './types';
 import { getIcon } from './icons';
 
@@ -249,6 +249,29 @@ export async function createNotification(notification: NewNotification): Promise
         createdAt: Timestamp.now(),
     });
     return docRef.id;
+}
+
+export async function getAdminNotifications(): Promise<Notification[]> {
+    const admins = await findAdmins();
+    if (admins.length === 0) {
+        return [];
+    }
+    const adminIds = admins.map(a => a.id);
+
+    // Firestore 'in' query is limited to 30 items. We'll query for the first 30 admins.
+    const q = query(
+        collection(db, 'notifications'), 
+        where('userId', 'in', adminIds.slice(0, 30)),
+        orderBy('createdAt', 'desc'),
+        limit(10)
+    );
+
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+        return [];
+    }
+
+    return snapshot.docs.map(doc => parseDocWithDateConversion(doc)) as Notification[];
 }
 
 export async function markNotificationsAsRead(userId: string): Promise<void> {
