@@ -3,44 +3,68 @@ import { getRooms } from "@/lib/firebase-service";
 import type { Room } from "@/lib/types";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { BookingForm } from "@/components/BookingForm";
 
 export default async function SearchResultsPage({
   searchParams,
 }: {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams?: { [key:string]: string | string[] | undefined };
 }) {
   const query = searchParams?.q as string | undefined;
-  
-  if (!query?.trim()) {
-      return (
-         <div className="container mx-auto px-4 py-16 text-center">
-            <h1 className="text-5xl font-headline">Search Rooms</h1>
-            <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-                Please enter a search term in the header to find a room.
-            </p>
-            <Button asChild className="mt-6">
-                <Link href="/rooms">Browse All Rooms</Link>
-            </Button>
-        </div>
-      )
-  }
+  const checkIn = searchParams?.checkIn as string | undefined;
+  const checkOut = searchParams?.checkOut as string | undefined;
+  const guests = searchParams?.guests as string | undefined;
 
   const allRooms = await getRooms();
-  
-  const trimmedQuery = query.trim().toLowerCase();
-  const filteredRooms = allRooms.filter(
-    (room) =>
+  let filteredRooms: Room[] = [];
+  let title = "Search For a Room";
+  let description = "";
+
+  if (query?.trim()) {
+    const trimmedQuery = query.trim().toLowerCase();
+    filteredRooms = allRooms.filter(
+      (room) =>
         room.name.toLowerCase().includes(trimmedQuery) ||
         room.description.toLowerCase().includes(trimmedQuery)
-  );
+    );
+    title = "Search Results";
+    description = `${filteredRooms.length} ${
+      filteredRooms.length === 1 ? "result" : "results"
+    } for: "${query}"`;
+  } else if (checkIn && checkOut) {
+    // In a real app, you would filter rooms based on booking availability against the dates.
+    // For this simulation, we'll assume all rooms are available.
+    filteredRooms = allRooms;
+    const guestCount = parseInt(guests || "1");
+    title = "Available Rooms";
+    description = `Showing rooms available from ${checkIn} to ${checkOut} for ${guestCount} ${guestCount === 1 ? "guest" : "guests"}`;
+  } else {
+    // If no search params, show the booking form to prompt a search.
+    return (
+      <div className="container mx-auto px-4 py-16 text-center">
+        <h1 className="text-5xl font-headline">Find Your Perfect Room</h1>
+        <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
+          Use the form below to check availability and find the ideal room for
+          your stay.
+        </p>
+        <div className="mt-8">
+            <BookingForm />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-headline">Search Results</h1>
+        <h1 className="text-5xl font-headline">{title}</h1>
         <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-            {filteredRooms.length} {filteredRooms.length === 1 ? 'result' : 'results'} for: <span className="font-semibold text-foreground">{query}</span>
+          {description}
         </p>
+      </div>
+      
+      <div className="mb-12">
+         <BookingForm />
       </div>
 
       {filteredRooms.length > 0 ? (
@@ -53,11 +77,12 @@ export default async function SearchResultsPage({
         <div className="text-center py-16">
           <p className="text-2xl font-semibold">No Rooms Found</p>
           <p className="text-muted-foreground mt-2">
-            We couldn't find any rooms matching your search. Try a different term.
+            We couldn't find any rooms matching your criteria. Try different
+            dates or search terms.
           </p>
-           <Button asChild className="mt-6">
-                <Link href="/rooms">Browse All Rooms</Link>
-            </Button>
+          <Button asChild className="mt-6">
+            <Link href="/rooms">Browse All Rooms</Link>
+          </Button>
         </div>
       )}
     </div>

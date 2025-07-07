@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { BedDouble, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { getSession } from "@/lib/auth";
@@ -7,7 +7,8 @@ import { logoutAction } from "@/lib/actions";
 import { NotificationBell } from "./NotificationBell";
 import { ModeToggle } from "./ModeToggle";
 import { Separator } from "@/components/ui/separator";
-import { SearchForm } from "./SearchForm";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { BookingForm } from "../BookingForm";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -49,7 +50,19 @@ export default async function Header() {
         </nav>
 
         <div className="flex flex-1 items-center justify-end space-x-2 md:space-x-4">
-            <SearchForm />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button>
+                  <BedDouble className="mr-2 h-4 w-4" />
+                  Book a Room
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-96" align="end">
+                <h4 className="font-medium leading-none p-4 pb-0">Check Availability</h4>
+                <BookingForm isPopover={true} />
+              </PopoverContent>
+            </Popover>
+
             <ModeToggle />
             {session && <NotificationBell session={session} />}
             {session ? (
