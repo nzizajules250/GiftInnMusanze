@@ -128,7 +128,7 @@ export async function findBookingForLogin(guestName: string, guestIdNumber: stri
         where('guestName', '==', guestName),
         where('guestIdNumber', '==', guestIdNumber),
         where('phoneNumber', '==', phoneNumber),
-        where('status', '==', 'Confirmed')
+        where('status', 'in', ['Confirmed', 'Pending'])
     );
     const snapshot = await getDocs(q);
     if (snapshot.empty) {

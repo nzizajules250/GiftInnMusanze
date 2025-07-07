@@ -8,6 +8,7 @@ import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { Badge } from "@/components/ui/badge";
 
 export default async function UserDashboardPage() {
     const session = await getSession();
@@ -33,11 +34,11 @@ export default async function UserDashboardPage() {
             <div className="md:col-span-2">
                 <Card>
                     <CardHeader>
-                        <CardTitle>Upcoming Stays</CardTitle>
-                        <CardDescription>Here are your confirmed bookings.</CardDescription>
+                        <CardTitle>My Bookings</CardTitle>
+                        <CardDescription>Here are your recent bookings.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                        {userBookings.filter(b => b.status === 'Confirmed').map((booking) => {
+                        {userBookings.map((booking) => {
                              const room = rooms.find(r => r.name === booking.roomName);
                              return (
                                 <div key={booking.id} className="flex items-center space-x-4 p-4 border rounded-lg">
@@ -58,13 +59,18 @@ export default async function UserDashboardPage() {
                                         </p>
                                         <p className="text-sm font-bold mt-2">${booking.total.toFixed(2)}</p>
                                     </div>
-                                    <Button variant="outline" size="sm">Manage</Button>
+                                    <div className="flex flex-col items-end gap-2">
+                                        <Badge variant={booking.status === 'Confirmed' ? 'default' : booking.status === 'Cancelled' ? 'destructive' : 'secondary'}>
+                                            {booking.status}
+                                        </Badge>
+                                        <Button variant="outline" size="sm">Manage</Button>
+                                    </div>
                                 </div>
                              )
                         })}
-                         {userBookings.filter(b => b.status === 'Confirmed').length === 0 && (
+                         {userBookings.length === 0 && (
                             <div className="text-center py-8">
-                                <p className="text-muted-foreground">You have no upcoming stays.</p>
+                                <p className="text-muted-foreground">You have no bookings yet.</p>
                                 <Button asChild className="mt-4">
                                     <Link href="/rooms">Book a Room</Link>
                                 </Button>

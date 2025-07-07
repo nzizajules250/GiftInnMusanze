@@ -50,11 +50,10 @@ const guestLoginSchema = z.object({
 });
 
 export async function guestLoginAction(values: z.infer<typeof guestLoginSchema>) {
-  let success = false;
   try {
     const validatedData = guestLoginSchema.safeParse(values);
     if (!validatedData.success) {
-      return { success: false, error: 'Invalid input.' };
+      return { error: 'Invalid input.' };
     }
 
     const { guestName, guestIdNumber, phoneNumber } = validatedData.data;
@@ -66,21 +65,17 @@ export async function guestLoginAction(values: z.infer<typeof guestLoginSchema>)
 
     if (!booking) {
       return {
-        success: false,
-        error: 'No confirmed booking found with these details. Please check your information or wait for booking confirmation.',
+        error: 'No confirmed or pending booking found with these details. Please check your information or contact support.',
       };
     }
 
     await createSession(booking.id, 'guest');
-    success = true;
   } catch (e: any) {
     console.error('Guest login error:', e);
-    return { success: false, error: e.message || 'An unexpected error occurred.' };
+    return { error: e.message || 'An unexpected error occurred.' };
   }
-
-  if (success) {
-    redirect('/dashboard');
-  }
+  
+  redirect('/dashboard');
 }
 
 const adminLoginSchema = z.object({
@@ -89,35 +84,32 @@ const adminLoginSchema = z.object({
 });
 
 export async function adminLoginAction(values: z.infer<typeof adminLoginSchema>) {
-  let success = false;
-  try {
-    const validatedData = adminLoginSchema.safeParse(values);
-    if (!validatedData.success) {
-      return { success: false, error: 'Invalid input.' };
+    try {
+        const validatedData = adminLoginSchema.safeParse(values);
+        if (!validatedData.success) {
+        return { error: 'Invalid input.' };
+        }
+
+        const { email, password } = validatedData.data;
+        const admin = await findAdminByEmail(email);
+
+        if (!admin) {
+        return { error: 'Invalid credentials.' };
+        }
+
+        const isPasswordMatch = await bcrypt.compare(password, admin.passwordHash);
+
+        if (!isPasswordMatch) {
+        return { error: 'Invalid credentials.' };
+        }
+
+        await createSession(admin.id, 'admin');
+    } catch (e: any) {
+        console.error('Admin login error:', e);
+        return { error: e.message || 'An unexpected error occurred.' };
     }
-
-    const { email, password } = validatedData.data;
-    const admin = await findAdminByEmail(email);
-
-    if (!admin) {
-      return { success: false, error: 'Invalid credentials.' };
-    }
-
-    const isPasswordMatch = await bcrypt.compare(password, admin.passwordHash);
-
-    if (!isPasswordMatch) {
-      return { success: false, error: 'Invalid credentials.' };
-    }
-
-    await createSession(admin.id, 'admin');
-    success = true;
-  } catch (e: any) {
-    console.error('Admin login error:', e);
-    return { success: false, error: e.message || 'An unexpected error occurred.' };
-  }
-  if (success) {
+    
     redirect('/dashboard/admin');
-  }
 }
 
 const adminRegisterSchema = z.object({
@@ -131,40 +123,35 @@ const adminRegisterSchema = z.object({
 export async function adminRegisterAction(
   values: z.infer<typeof adminRegisterSchema>
 ) {
-  let success = false;
-  try {
-    const validatedData = adminRegisterSchema.safeParse(values);
-    if (!validatedData.success) {
-      const firstError = validatedData.error.errors[0].message;
-      return { success: false, error: firstError };
+    try {
+        const validatedData = adminRegisterSchema.safeParse(values);
+        if (!validatedData.success) {
+        const firstError = validatedData.error.errors[0].message;
+        return { error: firstError };
+        }
+
+        const { email, password } = validatedData.data;
+
+        const existingAdmin = await findAdminByEmail(email);
+        if (existingAdmin) {
+        return {
+            error: 'An admin with this email already exists.',
+        };
+        }
+
+        const passwordHash = await bcrypt.hash(password, 10);
+        const adminId = await createAdminUserInFirestore(email, passwordHash);
+
+        await createSession(adminId, 'admin');
+    } catch (e: any) {
+        console.error('Admin registration error:', e);
+        return {
+        error:
+            e.message || 'An unexpected error occurred during registration.',
+        };
     }
 
-    const { email, password } = validatedData.data;
-
-    const existingAdmin = await findAdminByEmail(email);
-    if (existingAdmin) {
-      return {
-        success: false,
-        error: 'An admin with this email already exists.',
-      };
-    }
-
-    const passwordHash = await bcrypt.hash(password, 10);
-    const adminId = await createAdminUserInFirestore(email, passwordHash);
-
-    await createSession(adminId, 'admin');
-    success = true;
-  } catch (e: any) {
-    console.error('Admin registration error:', e);
-    return {
-      success: false,
-      error:
-        e.message || 'An unexpected error occurred during registration.',
-    };
-  }
-  if (success) {
     redirect('/dashboard/admin');
-  }
 }
 
 export async function logoutAction() {
@@ -187,12 +174,10 @@ const createBookingSchema = z.object({
 
 
 export async function createBookingAction(values: z.infer<typeof createBookingSchema>) {
-    let success = false;
-    let bookingId;
     try {
         const validatedData = createBookingSchema.safeParse(values);
         if (!validatedData.success) {
-            return { success: false, error: validatedData.error.errors[0].message };
+            return { error: validatedData.error.errors[0].message };
         }
         
         const bookingData = {
@@ -200,7 +185,7 @@ export async function createBookingAction(values: z.infer<typeof createBookingSc
             status: 'Pending' as const,
         }
 
-        bookingId = await createBooking(bookingData);
+        const bookingId = await createBooking(bookingData);
 
         // Notify all admins about the new booking
         const admins = await findAdmins();
@@ -212,16 +197,12 @@ export async function createBookingAction(values: z.infer<typeof createBookingSc
                 isRead: false,
             });
         }
-        
-        success = true;
     } catch(e: any) {
         console.error('Booking creation error:', e);
-        return { success: false, error: e.message || 'An unexpected error occurred.' };
+        return { error: e.message || 'An unexpected error occurred.' };
     }
 
-    if (success) {
-        redirect('/login?booking=success');
-    }
+    redirect('/login?booking=success');
 }
 
 const contactFormSchema = z.object({
