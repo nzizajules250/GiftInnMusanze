@@ -7,7 +7,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { BookingForm } from "@/components/BookingForm";
-import { getRooms, getAmenities } from "@/lib/firebase-service";
+import { getRooms, getAmenities, getBookings } from "@/lib/firebase-service";
 import { RoomCard } from "@/components/RoomCard";
 import { AmenityCard } from "@/components/AmenityCard";
 import { RecommendationEngine } from "@/components/RecommendationEngine";
@@ -20,7 +20,25 @@ const heroImages = [
 ];
 
 export default async function Home() {
-  const [rooms, amenities] = await Promise.all([getRooms(), getAmenities()]);
+  const [rooms, amenities, bookings] = await Promise.all([getRooms(), getAmenities(), getBookings()]);
+  const confirmedBookings = bookings.filter(b => b.status === 'Confirmed');
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const occupiedRoomIds = new Set(
+    confirmedBookings
+      .filter(booking => {
+          if (!booking.roomId) return false;
+          const checkIn = new Date(booking.checkIn);
+          const checkOut = new Date(booking.checkOut);
+          checkIn.setHours(0, 0, 0, 0);
+          checkOut.setHours(0, 0, 0, 0);
+          return checkIn <= today && checkOut > today;
+      })
+      .map(booking => booking.roomId)
+  );
+
 
   return (
     <div className="flex flex-col">
@@ -67,7 +85,7 @@ export default async function Home() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {rooms.slice(0, 9).map((room) => (
-            <RoomCard key={room.id} room={room} />
+            <RoomCard key={room.id} room={room} isOccupied={occupiedRoomIds.has(room.id)} />
           ))}
         </div>
       </section>

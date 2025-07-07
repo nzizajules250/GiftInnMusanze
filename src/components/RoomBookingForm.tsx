@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { format, differenceInDays } from "date-fns"
-import { Calendar as CalendarIcon, Loader2 } from "lucide-react"
+import { Calendar as CalendarIcon, Loader2, Info } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -24,6 +24,7 @@ import { Calendar } from "./ui/calendar"
 import { cn } from "@/lib/utils"
 import { createBookingAction } from "@/lib/actions"
 import type { Room } from "@/lib/types"
+import { Alert, AlertTitle, AlertDescription } from "./ui/alert"
 
 const formSchema = z.object({
   guestName: z.string().min(2, { message: "Name must be at least 2 characters." }),
@@ -36,7 +37,7 @@ const formSchema = z.object({
     path: ["checkOut"],
 });
 
-export function RoomBookingForm({ room }: { room: Room }) {
+export function RoomBookingForm({ room, isOccupied }: { room: Room, isOccupied?: boolean }) {
     const { toast } = useToast()
     const [loading, setLoading] = React.useState(false);
     const [total, setTotal] = React.useState(0);
@@ -68,6 +69,7 @@ export function RoomBookingForm({ room }: { room: Room }) {
 
         const bookingData = {
             ...values,
+            roomId: room.id,
             roomName: room.name,
             total,
         }
@@ -84,6 +86,26 @@ export function RoomBookingForm({ room }: { room: Room }) {
         // On success, the action redirects, so no success toast is needed here.
         setLoading(false);
     }
+    
+    if (isOccupied) {
+        return (
+            <Card className="shadow-lg">
+                <CardHeader>
+                    <CardTitle className="font-headline text-2xl">Reserve Your Stay</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Alert>
+                        <Info className="h-4 w-4" />
+                        <AlertTitle>Currently Occupied</AlertTitle>
+                        <AlertDescription>
+                            This room is occupied today. Please check back later or search for different dates.
+                        </AlertDescription>
+                    </Alert>
+                </CardContent>
+            </Card>
+        );
+    }
+
 
   return (
     <Card className="shadow-lg">

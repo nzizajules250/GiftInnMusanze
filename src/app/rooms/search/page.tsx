@@ -1,5 +1,5 @@
 import { RoomCard } from "@/components/RoomCard";
-import { getRooms } from "@/lib/firebase-service";
+import { getRooms, getBookings } from "@/lib/firebase-service";
 import type { Room } from "@/lib/types";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,9 @@ export default async function SearchResultsPage({
   const checkOut = searchParams?.checkOut as string | undefined;
   const guests = searchParams?.guests as string | undefined;
 
-  const allRooms = await getRooms();
+  const [allRooms, allBookings] = await Promise.all([getRooms(), getBookings()]);
+  const confirmedBookings = allBookings.filter(b => b.status === 'Confirmed');
+  
   let filteredRooms: Room[] = [];
   let title = "Search For a Room";
   let description = "";
@@ -32,12 +34,24 @@ export default async function SearchResultsPage({
       filteredRooms.length === 1 ? "result" : "results"
     } for: "${query}"`;
   } else if (checkIn && checkOut) {
-    // In a real app, you would filter rooms based on booking availability against the dates.
-    // For this simulation, we'll assume all rooms are available.
-    filteredRooms = allRooms;
+    const searchCheckIn = new Date(checkIn);
+    const searchCheckOut = new Date(checkOut);
+    
+    const occupiedRoomIds = new Set(
+        confirmedBookings.filter(booking => {
+            if (!booking.roomId) return false;
+            const bookingCheckIn = new Date(booking.checkIn);
+            const bookingCheckOut = new Date(booking.checkOut);
+            // Check for date range overlap
+            return bookingCheckIn < searchCheckOut && bookingCheckOut > searchCheckIn;
+        }).map(booking => booking.roomId)
+    );
+    
+    filteredRooms = allRooms.filter(room => !occupiedRoomIds.has(room.id));
+    
     const guestCount = parseInt(guests || "1");
     title = "Available Rooms";
-    description = `Showing rooms available from ${checkIn} to ${checkOut} for ${guestCount} ${guestCount === 1 ? "guest" : "guests"}`;
+    description = `Found ${filteredRooms.length} rooms available from ${checkIn} to ${checkOut} for ${guestCount} ${guestCount === 1 ? "guest" : "guests"}`;
   } else {
     // If no search params, show the booking form to prompt a search.
     return (

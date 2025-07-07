@@ -1,4 +1,4 @@
-import { getRoomById } from "@/lib/firebase-service";
+import { getRoomById, getBookings } from "@/lib/firebase-service";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { RoomBookingForm } from "@/components/RoomBookingForm";
@@ -9,13 +9,31 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import { Badge } from "@/components/ui/badge";
 
 export default async function RoomDetailPage({ params }: { params: { id: string } }) {
-    const room = await getRoomById(params.id);
+    const [room, bookings] = await Promise.all([
+        getRoomById(params.id),
+        getBookings()
+    ]);
 
     if (!room) {
         notFound();
     }
+    
+    const confirmedBookings = bookings.filter(b => b.status === 'Confirmed' && b.roomId === room.id);
+  
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const isOccupiedToday = confirmedBookings.some(booking => {
+        if (!booking.roomId) return false;
+        const checkIn = new Date(booking.checkIn);
+        const checkOut = new Date(booking.checkOut);
+        checkIn.setHours(0, 0, 0, 0);
+        checkOut.setHours(0, 0, 0, 0);
+        return checkIn <= today && checkOut > today;
+    });
 
     return (
         <div className="container mx-auto px-4 py-16">
@@ -60,13 +78,16 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
                     </Carousel>
 
                     <div className="mt-8">
-                        <h1 className="text-4xl font-headline">{room.name}</h1>
+                        <div className="flex flex-wrap items-center gap-4">
+                            <h1 className="text-4xl font-headline">{room.name}</h1>
+                            {isOccupiedToday && <Badge variant="destructive">Occupied Today</Badge>}
+                        </div>
                         <p className="text-2xl font-bold mt-2">${room.price}<span className="text-lg font-normal text-muted-foreground">/night</span></p>
                         <p className="text-muted-foreground mt-4 text-lg">{room.description}</p>
                     </div>
                 </div>
                 <div className="lg:col-span-2">
-                    <RoomBookingForm room={room} />
+                    <RoomBookingForm room={room} isOccupied={isOccupiedToday} />
                 </div>
             </div>
         </div>

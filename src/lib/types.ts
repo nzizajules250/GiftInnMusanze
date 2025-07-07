@@ -31,6 +31,7 @@ export type Attraction = {
 
 export type Booking = {
   id: string;
+  roomId: string;
   guestName: string;
   guestIdNumber: string;
   phoneNumber: string;

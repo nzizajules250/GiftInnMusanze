@@ -1,8 +1,25 @@
 import { RoomCard } from "@/components/RoomCard";
-import { getRooms } from "@/lib/firebase-service";
+import { getRooms, getBookings } from "@/lib/firebase-service";
 
 export default async function RoomsPage() {
-  const rooms = await getRooms();
+  const [rooms, bookings] = await Promise.all([getRooms(), getBookings()]);
+  const confirmedBookings = bookings.filter(b => b.status === 'Confirmed');
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const occupiedRoomIds = new Set(
+    confirmedBookings
+      .filter(booking => {
+          if (!booking.roomId) return false;
+          const checkIn = new Date(booking.checkIn);
+          const checkOut = new Date(booking.checkOut);
+          checkIn.setHours(0, 0, 0, 0);
+          checkOut.setHours(0, 0, 0, 0);
+          return checkIn <= today && checkOut > today;
+      })
+      .map(booking => booking.roomId)
+  );
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -14,7 +31,7 @@ export default async function RoomsPage() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {rooms.map((room) => (
-          <RoomCard key={room.id} room={room} />
+          <RoomCard key={room.id} room={room} isOccupied={occupiedRoomIds.has(room.id)} />
         ))}
       </div>
     </div>

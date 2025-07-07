@@ -162,6 +162,7 @@ export async function logoutAction() {
 
 
 const createBookingSchema = z.object({
+    roomId: z.string(),
     guestName: z.string().min(2, { message: "Name must be at least 2 characters." }),
     guestIdNumber: z.string().min(4, { message: "ID number seems too short." }),
     phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),

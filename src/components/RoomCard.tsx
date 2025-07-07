@@ -3,12 +3,15 @@ import type { Room } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface RoomCardProps {
   room: Room;
+  isOccupied?: boolean;
 }
 
-export function RoomCard({ room }: RoomCardProps) {
+export function RoomCard({ room, isOccupied = false }: RoomCardProps) {
   return (
     <Card className="flex flex-col overflow-hidden transition-shadow hover:shadow-lg">
       <div className="relative w-full h-60">
@@ -17,8 +20,11 @@ export function RoomCard({ room }: RoomCardProps) {
           alt={`View of ${room.name}`}
           data-ai-hint={room.images?.[0]?.hint}
           fill
-          className="object-cover"
+          className={cn("object-cover", isOccupied && "brightness-50")}
         />
+         {isOccupied && (
+            <Badge variant="destructive" className="absolute top-3 right-3">Occupied</Badge>
+        )}
       </div>
       <CardHeader>
         <CardTitle className="font-headline text-2xl">{room.name}</CardTitle>
@@ -27,8 +33,8 @@ export function RoomCard({ room }: RoomCardProps) {
       <CardContent className="flex-grow"></CardContent>
       <CardFooter className="flex justify-between items-center">
         <p className="text-xl font-bold">${room.price}<span className="text-sm font-normal text-muted-foreground">/night</span></p>
-        <Button asChild variant="outline">
-          <Link href={`/rooms/${room.id}`}>View Details</Link>
+        <Button asChild variant="outline" disabled={isOccupied}>
+          <Link href={`/rooms/${room.id}`} className={cn(isOccupied && "pointer-events-none")}>View Details</Link>
         </Button>
       </CardFooter>
     </Card>
