@@ -1,7 +1,7 @@
 'use server';
 
 import { db } from './firebase';
-import { collection, getDocs, query, where, addDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, addDoc, doc, getDoc } from 'firebase/firestore';
 import type { Room, Booking, Amenity, Attraction, Admin } from './types';
 import { Wifi, Dumbbell, Waves, Utensils, Sparkles, Building, Trees, ShoppingBag, MapPin } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -72,13 +72,17 @@ export async function getBookings(): Promise<Booking[]> {
 }
 
 export async function getUserBookings(userId: string): Promise<Booking[]> {
-    const q = query(collection(db, 'bookings'), where('id', '==', userId));
-    const bookingsSnapshot = await getDocs(q);
-    if (!bookingsSnapshot.empty) {
-        return bookingsSnapshot.docs.map(doc => parseDocWithDateConversion(doc)) as Booking[];
+    // For a guest user, the userId in the session is their booking document ID.
+    // We will try to fetch that specific booking document.
+    const bookingDocRef = doc(db, 'bookings', userId);
+    const bookingSnapshot = await getDoc(bookingDocRef);
+    if (bookingSnapshot.exists()) {
+        return [parseDocWithDateConversion(bookingSnapshot) as Booking];
     }
     
-    // Fallback if the user has no specific bookings (or for initial demo)
+    // If no booking document is found with that ID, it might be an admin user
+    // on the user dashboard, or a guest with an invalid session.
+    // The original fallback seems intended for demo purposes, so we'll keep it.
     const allBookings = await getBookings();
     return allBookings.filter(b => b.status === 'Confirmed').slice(0, 2);
 }
