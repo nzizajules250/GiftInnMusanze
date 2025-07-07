@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { getUserBookings, getRooms, getUserProfile } from "@/lib/firebase-service";
@@ -12,6 +13,10 @@ export default async function UserDashboardPage() {
     const session = await getSession();
     if (!session) {
         redirect('/login');
+    }
+
+    if (session.role === 'admin') {
+        redirect('/dashboard/admin');
     }
 
     const [user, userBookings, rooms] = await Promise.all([
