@@ -74,41 +74,41 @@ export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenit
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-lg flex flex-col max-h-[90vh]">
         <DialogHeader>
           <DialogTitle>{amenity ? "Edit Amenity" : "Add New Amenity"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-             <ScrollArea className="max-h-[60vh]">
-                <div className="space-y-4 pr-6">
-                  <FormField control={form.control} name="title" render={({ field }) => (
-                      <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                  )}/>
-                  <FormField control={form.control} name="description" render={({ field }) => (
-                      <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-                  )}/>
-                  <FormField control={form.control} name="details" render={({ field }) => (
-                      <FormItem><FormLabel>Details</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                  )}/>
-                  <FormField control={form.control} name="icon" render={({ field }) => (
-                      <FormItem><FormLabel>Icon</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger><SelectValue placeholder="Select an icon" /></SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {availableIcons.map(iconName => (
-                            <SelectItem key={iconName} value={iconName}>{iconName}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                      </FormItem>
-                  )}/>
-                </div>
-              </ScrollArea>
-            <DialogFooter>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex-grow flex flex-col overflow-hidden space-y-4">
+            <ScrollArea className="flex-grow pr-6 -mr-6">
+              <div className="space-y-4">
+                <FormField control={form.control} name="title" render={({ field }) => (
+                    <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                <FormField control={form.control} name="description" render={({ field }) => (
+                    <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                <FormField control={form.control} name="details" render={({ field }) => (
+                    <FormItem><FormLabel>Details</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                )}/>
+                <FormField control={form.control} name="icon" render={({ field }) => (
+                    <FormItem><FormLabel>Icon</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger><SelectValue placeholder="Select an icon" /></SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {availableIcons.map(iconName => (
+                          <SelectItem key={iconName} value={iconName}>{iconName}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                    </FormItem>
+                )}/>
+              </div>
+            </ScrollArea>
+            <DialogFooter className="flex-shrink-0 pt-4 border-t">
               <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={loading}>
                 {loading && <Loader2 className="animate-spin mr-2" />}
