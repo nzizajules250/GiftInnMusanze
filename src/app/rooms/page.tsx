@@ -1,7 +1,9 @@
 import { RoomCard } from "@/components/RoomCard";
-import { rooms } from "@/lib/mock-data";
+import { getRooms } from "@/lib/firebase-service";
 
-export default function RoomsPage() {
+export default async function RoomsPage() {
+  const rooms = await getRooms();
+
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="text-center mb-12">

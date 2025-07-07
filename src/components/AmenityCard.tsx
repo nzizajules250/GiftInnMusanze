@@ -1,12 +1,5 @@
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import type { LucideIcon } from "lucide-react";
-
-interface Amenity {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-  details: string;
-}
+import type { Amenity } from "@/lib/types";
 
 interface AmenityCardProps {
   amenity: Amenity;

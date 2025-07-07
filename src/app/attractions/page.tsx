@@ -1,8 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { attractions } from "@/lib/mock-data";
+import { Card } from "@/components/ui/card";
+import { getAttractions } from "@/lib/firebase-service";
 import { AttractionsMap } from "@/components/AttractionsMap";
 
-export default function AttractionsPage() {
+export default async function AttractionsPage() {
+  const attractions = await getAttractions();
+
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="text-center mb-12">
@@ -17,7 +19,7 @@ export default function AttractionsPage() {
           {attractions.map((attraction) => {
             const Icon = attraction.icon;
             return (
-              <Card key={attraction.name} className="flex items-center p-4">
+              <Card key={attraction.id} className="flex items-center p-4">
                 <Icon className="w-8 h-8 mr-4 text-accent-foreground flex-shrink-0" />
                 <div>
                   <h3 className="font-semibold">{attraction.name}</h3>

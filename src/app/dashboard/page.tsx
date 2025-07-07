@@ -1,17 +1,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { userBookings, rooms } from "@/lib/mock-data";
+import { getUserBookings, getRooms } from "@/lib/firebase-service";
 import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export default function UserDashboardPage() {
+export default async function UserDashboardPage() {
     const user = {
         name: "Alex Doe",
         email: "alex.doe@example.com",
         avatar: "https://placehold.co/100x100.png"
     }
+    const [userBookings, rooms] = await Promise.all([getUserBookings(), getRooms()]);
 
   return (
     <div className="flex flex-col gap-8">

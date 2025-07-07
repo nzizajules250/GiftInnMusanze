@@ -7,7 +7,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import { BookingForm } from "@/components/BookingForm";
-import { rooms, amenities } from "@/lib/mock-data";
+import { getRooms, getAmenities } from "@/lib/firebase-service";
 import { RoomCard } from "@/components/RoomCard";
 import { AmenityCard } from "@/components/AmenityCard";
 import { RecommendationEngine } from "@/components/RecommendationEngine";
@@ -19,7 +19,9 @@ const heroImages = [
   { src: "https://placehold.co/1600x800.png", alt: "Rooftop pool with a stunning sunset view", hint: "rooftop pool" },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const [rooms, amenities] = await Promise.all([getRooms(), getAmenities()]);
+
   return (
     <div className="flex flex-col">
       <section className="relative w-full h-[60vh] md:h-[80vh]">
@@ -71,7 +73,7 @@ export default function Home() {
 
       <section className="bg-primary/20 py-20">
         <div className="container mx-auto px-4">
-          <RecommendationEngine />
+          <RecommendationEngine allRooms={rooms} />
         </div>
       </section>
 
@@ -81,7 +83,7 @@ export default function Home() {
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {amenities.map((amenity) => (
-            <AmenityCard key={amenity.title} amenity={amenity} />
+            <AmenityCard key={amenity.id} amenity={amenity} />
           ))}
         </div>
       </section>

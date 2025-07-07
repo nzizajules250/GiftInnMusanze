@@ -16,21 +16,21 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getRecommendationsAction } from "@/lib/actions";
-import { rooms } from "@/lib/mock-data";
 import { Loader2, Wand2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import type { Room } from "@/lib/types";
 
 const recommendationSchema = z.object({
   pastBehavior: z.string().min(10, { message: "Please describe your past stays or preferences." }),
   statedPreferences: z.string().min(10, { message: "Please tell us what you're looking for." }),
 });
 
-const availableRoomsString = rooms.map(r => `${r.name}: ${r.description}`).join('\n');
-
-export function RecommendationEngine() {
+export function RecommendationEngine({ allRooms }: { allRooms: Room[] }) {
   const [loading, setLoading] = useState(false);
   const [recommendation, setRecommendation] = useState("");
   const [error, setError] = useState("");
+
+  const availableRoomsString = allRooms.map(r => `${r.name}: ${r.description}`).join('\n');
 
   const form = useForm<z.infer<typeof recommendationSchema>>({
     resolver: zodResolver(recommendationSchema),

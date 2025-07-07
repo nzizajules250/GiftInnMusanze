@@ -1,8 +1,10 @@
 import { AmenityCard } from "@/components/AmenityCard";
-import { amenities } from "@/lib/mock-data";
+import { getAmenities } from "@/lib/firebase-service";
 import Image from "next/image";
 
-export default function AmenitiesPage() {
+export default async function AmenitiesPage() {
+  const amenities = await getAmenities();
+
   return (
     <>
       <section className="relative h-[40vh] bg-primary/20 flex items-center justify-center">
@@ -24,7 +26,7 @@ export default function AmenitiesPage() {
       <div className="container mx-auto px-4 py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {amenities.map((amenity) => (
-            <AmenityCard key={amenity.title} amenity={amenity} />
+            <AmenityCard key={amenity.id} amenity={amenity} />
           ))}
         </div>
       </div>

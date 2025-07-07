@@ -7,10 +7,12 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { bookings } from "@/lib/mock-data"
+import { getBookings } from "@/lib/firebase-service"
 import { Badge } from "@/components/ui/badge"
 
-export function RecentBookings() {
+export async function RecentBookings() {
+  const bookings = await getBookings();
+
   return (
     <Card>
       <CardHeader>
