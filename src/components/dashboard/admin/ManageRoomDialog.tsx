@@ -98,8 +98,8 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
           <DialogTitle>{room ? "Edit Room" : "Add New Room"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="flex-grow flex flex-col overflow-hidden space-y-4">
-            <ScrollArea className="flex-grow pr-6 -mr-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col gap-4 min-h-0">
+            <ScrollArea className="flex-auto pr-6">
                 <div className="space-y-4">
                     <FormField control={form.control} name="name" render={({ field }) => (
                         <FormItem><FormLabel>Room Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
