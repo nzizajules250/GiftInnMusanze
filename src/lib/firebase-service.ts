@@ -13,10 +13,23 @@ const parseDocWithDateConversion = (doc: any) => {
     return { id: doc.id, ...data };
 };
 
+const transformRoomData = (doc: any) => {
+    let data = parseDocWithDateConversion(doc) as any;
+    if (data.image && !data.images) {
+        data.images = [{ url: data.image, hint: data.hint || '' }];
+        delete data.image;
+        delete data.hint;
+    }
+    if (!data.images) {
+        data.images = [];
+    }
+    return data;
+}
+
 export async function getRooms(): Promise<Room[]> {
   const roomsCollection = collection(db, 'rooms');
   const roomsSnapshot = await getDocs(roomsCollection);
-  const roomsList = roomsSnapshot.docs.map(doc => parseDocWithDateConversion(doc));
+  const roomsList = roomsSnapshot.docs.map(transformRoomData);
   return roomsList as Room[];
 }
 
@@ -26,7 +39,7 @@ export async function getRoomById(id: string): Promise<Room | null> {
     if (!roomSnapshot.exists()) {
         return null;
     }
-    return parseDocWithDateConversion(roomSnapshot) as Room;
+    return transformRoomData(roomSnapshot) as Room;
 }
 
 export async function getAmenities(): Promise<(Amenity & { iconName: string })[]> {
@@ -169,12 +182,16 @@ export async function createBooking(bookingData: NewBookingData): Promise<string
 // Admin management functions
 
 export async function saveRoom(room: Omit<Room, 'id'> & { id?: string }) {
+    const roomDataToSave: any = { ...room };
+    delete roomDataToSave.image;
+    delete roomDataToSave.hint;
+
     if (room.id) {
         const roomDocRef = doc(db, 'rooms', room.id);
-        const { id, ...roomData } = room;
+        const { id, ...roomData } = roomDataToSave;
         await setDoc(roomDocRef, roomData);
     } else {
-        await addDoc(collection(db, 'rooms'), room);
+        await addDoc(collection(db, 'rooms'), roomDataToSave);
     }
 }
 

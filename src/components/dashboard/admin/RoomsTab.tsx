@@ -66,7 +66,13 @@ export function RoomsTab({ rooms }: { rooms: Room[] }) {
                             {rooms.map((room) => (
                                 <TableRow key={room.id}>
                                     <TableCell className="hidden sm:table-cell">
-                                        <Image src={room.image} alt={room.name} width={64} height={64} className="rounded-md object-cover" data-ai-hint={room.hint} />
+                                        <Image 
+                                            src={room.images?.[0]?.url || 'https://placehold.co/64x64.png'} 
+                                            alt={room.name} 
+                                            width={64} 
+                                            height={64} 
+                                            className="rounded-md object-cover" 
+                                            data-ai-hint={room.images?.[0]?.hint} />
                                     </TableCell>
                                     <TableCell>
                                         <div className="font-medium">{room.name}</div>

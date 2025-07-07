@@ -1,12 +1,16 @@
 import type { LucideIcon } from 'lucide-react';
 
+export type RoomImage = {
+  url: string;
+  hint: string;
+};
+
 export type Room = {
   id: string;
   name: string;
   description: string;
   price: number;
-  image: string;
-  hint: string;
+  images: RoomImage[];
 };
 
 export type Amenity = {

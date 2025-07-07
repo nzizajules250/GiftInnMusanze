@@ -25,7 +25,7 @@ import { createSession, deleteSession } from './auth';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
-import type { Room, Amenity, Booking } from './types';
+import type { Amenity, Booking } from './types';
 
 
 export async function getRecommendationsAction(
@@ -259,10 +259,26 @@ export async function contactFormAction(values: z.infer<typeof contactFormSchema
 }
 
 // Admin management actions
+const imageSchema = z.object({
+  url: z.string().url("Please enter a valid image URL."),
+  hint: z.string().min(2, "Hint must be at least 2 characters."),
+});
 
-export async function saveRoomAction(roomData: Omit<Room, 'id'> & { id?: string }) {
+const roomSchema = z.object({
+  id: z.string().optional(),
+  name: z.string().min(2, "Name must be at least 2 characters."),
+  description: z.string().min(10, "Description must be at least 10 characters."),
+  price: z.coerce.number().min(1, "Price must be greater than 0."),
+  images: z.array(imageSchema).min(1, "At least one image is required."),
+});
+
+export async function saveRoomAction(roomData: z.infer<typeof roomSchema>) {
     try {
-        await saveRoom(roomData);
+        const validatedData = roomSchema.safeParse(roomData);
+        if (!validatedData.success) {
+            return { success: false, error: validatedData.error.errors[0].message };
+        }
+        await saveRoom(validatedData.data);
         revalidatePath('/dashboard/admin');
         revalidatePath('/rooms');
         revalidatePath('/');

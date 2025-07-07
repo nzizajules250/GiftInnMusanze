@@ -13,9 +13,9 @@ export function RoomCard({ room }: RoomCardProps) {
     <Card className="flex flex-col overflow-hidden transition-shadow hover:shadow-lg">
       <div className="relative w-full h-60">
         <Image
-          src={room.image}
+          src={room.images?.[0]?.url || 'https://placehold.co/600x400.png'}
           alt={`View of ${room.name}`}
-          data-ai-hint={room.hint}
+          data-ai-hint={room.images?.[0]?.hint}
           fill
           className="object-cover"
         />

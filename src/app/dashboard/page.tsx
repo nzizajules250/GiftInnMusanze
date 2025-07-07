@@ -38,12 +38,12 @@ export default async function UserDashboardPage() {
                                 <div key={booking.id} className="flex items-center space-x-4 p-4 border rounded-lg">
                                     {room && (
                                         <Image 
-                                            src={room.image}
+                                            src={room.images?.[0]?.url || 'https://placehold.co/100x100.png'}
                                             alt={room.name}
                                             width={100}
                                             height={100}
                                             className="rounded-md object-cover w-24 h-24"
-                                            data-ai-hint={room.hint}
+                                            data-ai-hint={room.images?.[0]?.hint}
                                         />
                                     )}
                                     <div className="flex-grow">
