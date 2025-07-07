@@ -2,43 +2,35 @@
 
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import React from "react"
+import type { Booking } from "@/lib/types"
+import { format, getMonth } from "date-fns"
 
-const initialData = [
-  { name: "Jan", total: 0 },
-  { name: "Feb", total: 0 },
-  { name: "Mar", total: 0 },
-  { name: "Apr", total: 0 },
-  { name: "May", total: 0 },
-  { name: "Jun", total: 0 },
-  { name: "Jul", total: 0 },
-  { name: "Aug", total: 0 },
-  { name: "Sep", total: 0 },
-  { name: "Oct", total: 0 },
-  { name: "Nov", total: 0 },
-  { name: "Dec", total: 0 },
-]
+interface RevenueChartProps {
+  bookings: Booking[];
+}
 
-export function RevenueChart() {
-    const [data, setData] = React.useState(initialData);
+export function RevenueChart({ bookings }: RevenueChartProps) {
+    const monthlyRevenue = Array.from({ length: 12 }, (_, i) => ({
+        name: format(new Date(0, i), 'LLL'),
+        total: 0,
+    }));
 
-    React.useEffect(() => {
-        const generatedData = initialData.map(item => ({
-            ...item,
-            total: Math.floor(Math.random() * 5000) + 1000
-        }));
-        setData(generatedData);
-    }, []);
+    for (const booking of bookings) {
+        if (booking.status === 'Confirmed') {
+            const month = getMonth(booking.checkIn);
+            monthlyRevenue[month].total += booking.total;
+        }
+    }
 
     return (
         <Card>
             <CardHeader>
                 <CardTitle>Revenue Overview</CardTitle>
-                <CardDescription>Total revenue from bookings over the last year.</CardDescription>
+                <CardDescription>Total revenue from confirmed bookings this year.</CardDescription>
             </CardHeader>
             <CardContent>
                  <ResponsiveContainer width="100%" height={350}>
-                    <BarChart data={data}>
+                    <BarChart data={monthlyRevenue}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis
                             dataKey="name"

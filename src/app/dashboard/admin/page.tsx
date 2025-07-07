@@ -17,8 +17,9 @@ export default async function AdminDashboardPage() {
         getBookings(),
     ]);
 
-    const totalRevenue = bookings.reduce((acc, b) => acc + b.total, 0);
     const confirmedBookings = bookings.filter(b => b.status === 'Confirmed');
+
+    const totalRevenue = confirmedBookings.reduce((acc, b) => acc + b.total, 0);
 
     return (
         <div className="flex flex-col gap-8">
@@ -38,7 +39,7 @@ export default async function AdminDashboardPage() {
                             title="Total Revenue"
                             value={`$${totalRevenue.toLocaleString()}`}
                             icon={DollarSign}
-                            description="All-time revenue from all bookings"
+                            description="Revenue from confirmed bookings"
                         />
                         <StatCard
                             title="Total Bookings"
@@ -61,7 +62,7 @@ export default async function AdminDashboardPage() {
                     </div>
                      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-7">
                         <div className="lg:col-span-4">
-                            <RevenueChart />
+                            <RevenueChart bookings={bookings} />
                         </div>
                         <div className="lg:col-span-3">
                            <Card className="h-full">
