@@ -7,6 +7,7 @@ import { logoutAction } from "@/lib/actions";
 import { NotificationBell } from "./NotificationBell";
 import { ModeToggle } from "./ModeToggle";
 import { Separator } from "@/components/ui/separator";
+import { SearchForm } from "./SearchForm";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -47,7 +48,8 @@ export default async function Header() {
           )}
         </nav>
 
-        <div className="flex flex-1 items-center justify-end space-x-2">
+        <div className="flex flex-1 items-center justify-end space-x-2 md:space-x-4">
+            <SearchForm />
             <ModeToggle />
             {session && <NotificationBell session={session} />}
             {session ? (
