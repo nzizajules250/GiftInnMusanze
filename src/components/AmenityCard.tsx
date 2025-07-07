@@ -1,12 +1,13 @@
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import type { Amenity } from "@/lib/types";
+import { getIcon } from "@/lib/icons";
 
 interface AmenityCardProps {
   amenity: Amenity;
 }
 
 export function AmenityCard({ amenity }: AmenityCardProps) {
-  const Icon = amenity.icon;
+  const Icon = getIcon(amenity.icon);
   return (
     <div className="group perspective h-64">
         <div className="relative preserve-3d group-hover:rotate-y-180 w-full h-full duration-700">

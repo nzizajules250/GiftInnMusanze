@@ -10,14 +10,15 @@ import { ManageAmenityDialog } from "./ManageAmenityDialog";
 import { DeleteConfirmationDialog } from "./DeleteConfirmationDialog";
 import { deleteAmenityAction } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
+import { getIcon } from "@/lib/icons";
 
-export function AmenitiesTab({ amenities }: { amenities: (Amenity & { iconName: string })[] }) {
+export function AmenitiesTab({ amenities }: { amenities: Amenity[] }) {
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [editingAmenity, setEditingAmenity] = useState<(Amenity & { iconName: string }) | null>(null);
-    const [deletingAmenity, setDeletingAmenity] = useState<(Amenity & { iconName: string }) | null>(null);
+    const [editingAmenity, setEditingAmenity] = useState<Amenity | null>(null);
+    const [deletingAmenity, setDeletingAmenity] = useState<Amenity | null>(null);
     const { toast } = useToast();
 
-    const handleEdit = (amenity: Amenity & { iconName: string }) => {
+    const handleEdit = (amenity: Amenity) => {
         setEditingAmenity(amenity);
         setDialogOpen(true);
     };
@@ -63,7 +64,7 @@ export function AmenitiesTab({ amenities }: { amenities: (Amenity & { iconName: 
                         </TableHeader>
                         <TableBody>
                             {amenities.map((amenity) => {
-                                const Icon = amenity.icon;
+                                const Icon = getIcon(amenity.icon);
                                 return (
                                     <TableRow key={amenity.id}>
                                         <TableCell><Icon className="w-6 h-6" /></TableCell>

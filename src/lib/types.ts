@@ -15,7 +15,7 @@ export type Room = {
 
 export type Amenity = {
     id: string;
-    icon: LucideIcon;
+    icon: string;
     title: string;
     description: string;
     details: string;
@@ -23,7 +23,7 @@ export type Amenity = {
 
 export type Attraction = {
     id: string;
-    icon: LucideIcon;
+    icon: string;
     name: string;
     distance: string;
     description: string;

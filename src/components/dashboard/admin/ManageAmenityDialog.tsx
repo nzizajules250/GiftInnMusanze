@@ -33,7 +33,7 @@ const formSchema = z.object({
 interface ManageAmenityDialogProps {
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
-  amenity: (Amenity & { iconName: string }) | null;
+  amenity: Amenity | null;
 }
 
 export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenityDialogProps) {
@@ -46,7 +46,7 @@ export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenit
 
   useEffect(() => {
     if (amenity) {
-      form.reset({ ...amenity, icon: amenity.iconName });
+      form.reset(amenity);
     } else {
       form.reset({ title: "", description: "", details: "", icon: "Wifi" });
     }

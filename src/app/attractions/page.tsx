@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { getAttractions } from "@/lib/firebase-service";
 import { AttractionsMap } from "@/components/AttractionsMap";
+import { getIcon } from "@/lib/icons";
 
 export default async function AttractionsPage() {
   const attractions = await getAttractions();
@@ -17,7 +18,7 @@ export default async function AttractionsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 flex flex-col gap-4">
           {attractions.map((attraction) => {
-            const Icon = attraction.icon;
+            const Icon = getIcon(attraction.icon);
             return (
               <Card key={attraction.id} className="flex items-center p-4">
                 <Icon className="w-8 h-8 mr-4 text-accent-foreground flex-shrink-0" />

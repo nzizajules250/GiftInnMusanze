@@ -42,30 +42,17 @@ export async function getRoomById(id: string): Promise<Room | null> {
     return transformRoomData(roomSnapshot) as Room;
 }
 
-export async function getAmenities(): Promise<(Amenity & { iconName: string })[]> {
+export async function getAmenities(): Promise<Amenity[]> {
     const amenitiesCollection = collection(db, 'amenities');
     const amenitiesSnapshot = await getDocs(amenitiesCollection);
-    const amenitiesList = amenitiesSnapshot.docs.map(doc => {
-        const data = parseDocWithDateConversion(doc) as any;
-        return {
-            ...data,
-            iconName: data.icon,
-            icon: getIcon(data.icon),
-        };
-    });
-    return amenitiesList as (Amenity & { iconName: string })[];
+    const amenitiesList = amenitiesSnapshot.docs.map(doc => parseDocWithDateConversion(doc));
+    return amenitiesList as Amenity[];
 }
 
 export async function getAttractions(): Promise<Attraction[]> {
     const attractionsCollection = collection(db, 'attractions');
     const attractionsSnapshot = await getDocs(attractionsCollection);
-    const attractionsList = attractionsSnapshot.docs.map(doc => {
-         const data = parseDocWithDateConversion(doc) as any;
-         return {
-            ...data,
-            icon: getIcon(data.icon),
-         }
-    });
+    const attractionsList = attractionsSnapshot.docs.map(doc => parseDocWithDateConversion(doc));
     return attractionsList as Attraction[];
 }
 
@@ -200,7 +187,7 @@ export async function deleteRoom(roomId: string) {
     await deleteDoc(doc(db, 'rooms', roomId));
 }
 
-export async function saveAmenity(amenity: Omit<Amenity, 'id' | 'icon'> & { id?: string, icon: string }) {
+export async function saveAmenity(amenity: Omit<Amenity, 'id'> & { id?: string }) {
     if (amenity.id) {
         const amenityDocRef = doc(db, 'amenities', amenity.id);
         const { id, ...amenityData } = amenity;
