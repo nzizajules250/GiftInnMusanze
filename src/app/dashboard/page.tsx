@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getUserBookings, getRooms } from "@/lib/firebase-service";
+import { getUserBookings, getRooms, getUserProfile } from "@/lib/firebase-service";
 import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,15 +14,11 @@ export default async function UserDashboardPage() {
         redirect('/login');
     }
 
-    // In a real app, you'd fetch user details based on session.userId
-    const user = {
-        name: "Alex Doe", 
-        email: "alex.doe@example.com",
-        avatar: "https://placehold.co/100x100.png"
-    }
-
-    // Fetch bookings associated with the logged-in user's ID
-    const [userBookings, rooms] = await Promise.all([getUserBookings(session.userId), getRooms()]);
+    const [user, userBookings, rooms] = await Promise.all([
+        getUserProfile(session), 
+        getUserBookings(session), 
+        getRooms()
+    ]);
 
   return (
     <div className="flex flex-col gap-8">

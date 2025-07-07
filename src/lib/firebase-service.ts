@@ -2,7 +2,7 @@
 
 import { db } from './firebase';
 import { collection, getDocs, query, where, addDoc, doc, getDoc } from 'firebase/firestore';
-import type { Room, Booking, Amenity, Attraction, Admin } from './types';
+import type { Room, Booking, Amenity, Attraction, Admin, SessionPayload } from './types';
 import { Wifi, Dumbbell, Waves, Utensils, Sparkles, Building, Trees, ShoppingBag, MapPin } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -71,21 +71,63 @@ export async function getBookings(): Promise<Booking[]> {
     return bookingsList as Booking[];
 }
 
-export async function getUserBookings(userId: string): Promise<Booking[]> {
+export async function getUserBookings(session: SessionPayload | null): Promise<Booking[]> {
+    if (!session) {
+        return [];
+    }
+
+    if (session.role === 'admin') {
+        // Admins use the admin dashboard, they don't have personal user bookings.
+        return [];
+    }
+
     // For a guest user, the userId in the session is their booking document ID.
-    // We will try to fetch that specific booking document.
-    const bookingDocRef = doc(db, 'bookings', userId);
+    const bookingDocRef = doc(db, 'bookings', session.userId);
     const bookingSnapshot = await getDoc(bookingDocRef);
     if (bookingSnapshot.exists()) {
         return [parseDocWithDateConversion(bookingSnapshot) as Booking];
     }
     
-    // If no booking document is found with that ID, it might be an admin user
-    // on the user dashboard, or a guest with an invalid session.
-    // The original fallback seems intended for demo purposes, so we'll keep it.
-    const allBookings = await getBookings();
-    return allBookings.filter(b => b.status === 'Confirmed').slice(0, 2);
+    // Fallback if guest's booking is not found
+    return [];
 }
+
+
+export async function getUserProfile(session: SessionPayload) {
+    if (session.role === 'admin') {
+        const adminDocRef = doc(db, 'admins', session.userId);
+        const adminSnapshot = await getDoc(adminDocRef);
+        if (adminSnapshot.exists()) {
+            const adminData = adminSnapshot.data() as Admin;
+            return {
+                name: "Administrator",
+                email: adminData.email,
+                avatar: "https://placehold.co/100x100.png"
+            }
+        }
+    }
+    
+    if (session.role === 'guest') {
+        const bookingDocRef = doc(db, 'bookings', session.userId);
+        const bookingSnapshot = await getDoc(bookingDocRef);
+        if (bookingSnapshot.exists()) {
+            const bookingData = bookingSnapshot.data() as Booking;
+            return {
+                name: bookingData.guestName,
+                email: "Guest Account",
+                avatar: "https://placehold.co/100x100.png"
+            }
+        }
+    }
+
+    // Fallback for not found user
+    return {
+        name: "Unknown User",
+        email: "",
+        avatar: "https://placehold.co/100x100.png"
+    }
+}
+
 
 // --- Auth Functions ---
 

@@ -29,12 +29,6 @@ export async function createSession(userId: string, role: 'admin' | 'guest') {
     httpOnly: true,
     path: '/',
   });
-
-  if (role === 'admin') {
-      redirect('/dashboard/admin');
-  } else {
-      redirect('/dashboard');
-  }
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
