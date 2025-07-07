@@ -10,11 +10,18 @@ import {
   findAdminByEmail,
   createAdminUserInFirestore,
   createBooking,
+  saveRoom,
+  deleteRoom,
+  saveAmenity,
+  deleteAmenity,
+  updateBookingStatus,
 } from './firebase-service';
 import { createSession, deleteSession } from './auth';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
-import { differenceInDays } from 'date-fns';
+import { revalidatePath } from 'next/cache';
+import type { Room, Amenity, Booking } from './types';
+
 
 export async function getRecommendationsAction(
   input: PersonalizedRecommendationsInput
@@ -197,5 +204,69 @@ export async function createBookingAction(values: z.infer<typeof createBookingSc
 
     if (success) {
         redirect('/login?booking=success');
+    }
+}
+
+// Admin management actions
+
+export async function saveRoomAction(roomData: Omit<Room, 'id'> & { id?: string }) {
+    try {
+        await saveRoom(roomData);
+        revalidatePath('/dashboard/admin');
+        revalidatePath('/rooms');
+        revalidatePath('/');
+        return { success: true };
+    } catch (e: any) {
+        console.error('Save room error:', e);
+        return { success: false, error: e.message };
+    }
+}
+
+export async function deleteRoomAction(roomId: string) {
+    try {
+        await deleteRoom(roomId);
+        revalidatePath('/dashboard/admin');
+        revalidatePath('/rooms');
+        revalidatePath('/');
+        return { success: true };
+    } catch (e: any) {
+        console.error('Delete room error:', e);
+        return { success: false, error: e.message };
+    }
+}
+
+export async function saveAmenityAction(amenityData: Omit<Amenity, 'id' | 'icon'> & { id?: string, icon: string }) {
+     try {
+        await saveAmenity(amenityData);
+        revalidatePath('/dashboard/admin');
+        revalidatePath('/amenities');
+        return { success: true };
+    } catch (e: any) {
+        console.error('Save amenity error:', e);
+        return { success: false, error: e.message };
+    }
+}
+
+export async function deleteAmenityAction(amenityId: string) {
+    try {
+        await deleteAmenity(amenityId);
+        revalidatePath('/dashboard/admin');
+        revalidatePath('/amenities');
+        return { success: true };
+    } catch (e: any) {
+        console.error('Delete amenity error:', e);
+        return { success: false, error: e.message };
+    }
+}
+
+
+export async function updateBookingStatusAction(bookingId: string, status: Booking['status']) {
+    try {
+        await updateBookingStatus(bookingId, status);
+        revalidatePath('/dashboard/admin');
+        return { success: true };
+    } catch (e: any) {
+        console.error('Update booking status error:', e);
+        return { success: false, error: e.message };
     }
 }

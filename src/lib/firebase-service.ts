@@ -1,25 +1,7 @@
-'use server';
-
 import { db } from './firebase';
-import { collection, getDocs, query, where, addDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, addDoc, doc, getDoc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
 import type { Room, Booking, Amenity, Attraction, Admin, SessionPayload } from './types';
-import { Wifi, Dumbbell, Waves, Utensils, Sparkles, Building, Trees, ShoppingBag, MapPin } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-
-const getIcon = (iconName: string): LucideIcon => {
-    const iconMap: { [key: string]: LucideIcon } = {
-        Waves,
-        Dumbbell,
-        Sparkles,
-        Utensils,
-        Building,
-        Trees,
-        ShoppingBag,
-        MapPin,
-        Wifi,
-    };
-    return iconMap[iconName] || Wifi;
-};
+import { getIcon } from './icons';
 
 const parseDocWithDateConversion = (doc: any) => {
     const data = doc.data();
@@ -47,17 +29,18 @@ export async function getRoomById(id: string): Promise<Room | null> {
     return parseDocWithDateConversion(roomSnapshot) as Room;
 }
 
-export async function getAmenities(): Promise<Amenity[]> {
+export async function getAmenities(): Promise<(Amenity & { iconName: string })[]> {
     const amenitiesCollection = collection(db, 'amenities');
     const amenitiesSnapshot = await getDocs(amenitiesCollection);
     const amenitiesList = amenitiesSnapshot.docs.map(doc => {
         const data = parseDocWithDateConversion(doc) as any;
         return {
             ...data,
+            iconName: data.icon,
             icon: getIcon(data.icon),
         };
     });
-    return amenitiesList as Amenity[];
+    return amenitiesList as (Amenity & { iconName: string })[];
 }
 
 export async function getAttractions(): Promise<Attraction[]> {
@@ -175,4 +158,39 @@ export async function createBooking(bookingData: NewBookingData): Promise<string
     const bookingsCollection = collection(db, 'bookings');
     const docRef = await addDoc(bookingsCollection, bookingData);
     return docRef.id;
+}
+
+// Admin management functions
+
+export async function saveRoom(room: Omit<Room, 'id'> & { id?: string }) {
+    if (room.id) {
+        const roomDocRef = doc(db, 'rooms', room.id);
+        const { id, ...roomData } = room;
+        await setDoc(roomDocRef, roomData);
+    } else {
+        await addDoc(collection(db, 'rooms'), room);
+    }
+}
+
+export async function deleteRoom(roomId: string) {
+    await deleteDoc(doc(db, 'rooms', roomId));
+}
+
+export async function saveAmenity(amenity: Omit<Amenity, 'id' | 'icon'> & { id?: string, icon: string }) {
+    if (amenity.id) {
+        const amenityDocRef = doc(db, 'amenities', amenity.id);
+        const { id, ...amenityData } = amenity;
+        await setDoc(amenityDocRef, amenityData);
+    } else {
+        await addDoc(collection(db, 'amenities'), amenity);
+    }
+}
+
+export async function deleteAmenity(amenityId: string) {
+    await deleteDoc(doc(db, 'amenities', amenityId));
+}
+
+export async function updateBookingStatus(bookingId: string, status: Booking['status']) {
+    const bookingDocRef = doc(db, 'bookings', bookingId);
+    await updateDoc(bookingDocRef, { status });
 }
