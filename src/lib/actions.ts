@@ -46,7 +46,7 @@ export async function getRecommendationsAction(
 const guestLoginSchema = z.object({
   guestName: z.string().min(1, 'Guest name is required.'),
   guestIdNumber: z.string().min(1, 'ID number is required.'),
-  roomName: z.string().min(1, 'Room name is required.'),
+  phoneNumber: z.string().min(1, 'Phone number is required.'),
 });
 
 export async function guestLoginAction(values: z.infer<typeof guestLoginSchema>) {
@@ -57,17 +57,17 @@ export async function guestLoginAction(values: z.infer<typeof guestLoginSchema>)
       return { success: false, error: 'Invalid input.' };
     }
 
-    const { guestName, guestIdNumber, roomName } = validatedData.data;
+    const { guestName, guestIdNumber, phoneNumber } = validatedData.data;
     const booking = await findBookingForLogin(
       guestName,
       guestIdNumber,
-      roomName
+      phoneNumber
     );
 
     if (!booking) {
       return {
         success: false,
-        error: 'Invalid credentials. Please check your details and try again.',
+        error: 'No confirmed booking found with these details. Please check your information or wait for booking confirmation.',
       };
     }
 

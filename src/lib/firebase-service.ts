@@ -136,11 +136,12 @@ export async function getUserProfile(session: SessionPayload) {
 
 // --- Auth & Booking Functions ---
 
-export async function findBookingForLogin(guestName: string, guestIdNumber: string, roomName: string): Promise<Booking | null> {
+export async function findBookingForLogin(guestName: string, guestIdNumber: string, phoneNumber: string): Promise<Booking | null> {
     const q = query(collection(db, 'bookings'), 
         where('guestName', '==', guestName),
         where('guestIdNumber', '==', guestIdNumber),
-        where('roomName', '==', roomName)
+        where('phoneNumber', '==', phoneNumber),
+        where('status', '==', 'Confirmed')
     );
     const snapshot = await getDocs(q);
     if (snapshot.empty) {

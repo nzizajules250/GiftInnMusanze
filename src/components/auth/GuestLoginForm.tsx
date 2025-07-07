@@ -21,7 +21,7 @@ import { Loader2 } from "lucide-react";
 const formSchema = z.object({
   guestName: z.string().min(2, "Name must be at least 2 characters."),
   guestIdNumber: z.string().min(4, "ID number seems too short."),
-  roomName: z.string().min(3, "Room name seems too short."),
+  phoneNumber: z.string().min(10, "Please enter a valid phone number."),
 });
 
 export function GuestLoginForm() {
@@ -33,7 +33,7 @@ export function GuestLoginForm() {
     defaultValues: {
       guestName: "",
       guestIdNumber: "",
-      roomName: "",
+      phoneNumber: "",
     },
   });
 
@@ -84,12 +84,12 @@ export function GuestLoginForm() {
         />
         <FormField
           control={form.control}
-          name="roomName"
+          name="phoneNumber"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Room Name</FormLabel>
+              <FormLabel>Phone Number</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Deluxe King Suite" {...field} />
+                <Input placeholder="Used during booking" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
