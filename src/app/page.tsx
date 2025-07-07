@@ -10,7 +10,6 @@ import { BookingForm } from "@/components/BookingForm";
 import { getRooms, getAmenities, getBookings } from "@/lib/firebase-service";
 import { RoomCard } from "@/components/RoomCard";
 import { AmenityCard } from "@/components/AmenityCard";
-import { RecommendationEngine } from "@/components/RecommendationEngine";
 import { AnimatedTitle } from "@/components/AnimatedTitle";
 
 const heroImages = [
@@ -87,12 +86,6 @@ export default async function Home() {
           {rooms.slice(0, 9).map((room) => (
             <RoomCard key={room.id} room={room} isOccupied={occupiedRoomIds.has(room.id)} />
           ))}
-        </div>
-      </section>
-
-      <section className="bg-primary/20 py-20">
-        <div className="container mx-auto px-4">
-          <RecommendationEngine allRooms={rooms} />
         </div>
       </section>
 
