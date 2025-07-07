@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { format } from "date-fns"
 import { Calendar as CalendarIcon, Users } from "lucide-react"
 
@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select"
 import { Card, CardContent } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form"
+import { Skeleton } from "./ui/skeleton"
 
 const formSchema = z.object({
   checkIn: z.date().optional(),
@@ -39,24 +40,37 @@ interface BookingFormProps {
 export function BookingForm({ isPopover = false }: BookingFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      guests: searchParams.get('guests') || "2",
-      checkIn: searchParams.get('checkIn') ? new Date(searchParams.get('checkIn')!) : undefined,
-      checkOut: searchParams.get('checkOut') ? new Date(searchParams.get('checkOut')!) : undefined,
+      guests: "2",
+      checkIn: undefined,
+      checkOut: undefined,
     }
   });
 
-  // Resync form if query params change (e.g., back/forward navigation)
   useEffect(() => {
-    form.reset({
-      guests: searchParams.get('guests') || "2",
-      checkIn: searchParams.get('checkIn') ? new Date(searchParams.get('checkIn')!) : undefined,
-      checkOut: searchParams.get('checkOut') ? new Date(searchParams.get('checkOut')!) : undefined,
-    })
-  }, [searchParams, form]);
+    if (isClient) {
+      const checkInParam = searchParams.get('checkIn');
+      const checkOutParam = searchParams.get('checkOut');
+      const guestsParam = searchParams.get('guests');
+
+      const checkInDate = checkInParam ? new Date(`${checkInParam}T00:00:00`) : undefined;
+      const checkOutDate = checkOutParam ? new Date(`${checkOutParam}T00:00:00`) : undefined;
+
+      form.reset({
+        guests: guestsParam || "2",
+        checkIn: checkInDate,
+        checkOut: checkOutDate,
+      })
+    }
+  }, [isClient, searchParams, form]);
 
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -70,6 +84,22 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
   
   const checkInDate = form.watch("checkIn");
 
+  if (!isClient) {
+    const SkeletonLoader = (
+        <div className={cn(
+            "grid items-end gap-4",
+            isPopover ? "grid-cols-1" : "grid-cols-1 md:grid-cols-4"
+        )}>
+            <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none">Check-in</label><Skeleton className="h-10 w-full" /></div>
+            <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none">Check-out</label><Skeleton className="h-10 w-full" /></div>
+            <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none">Guests</label><Skeleton className="h-10 w-full" /></div>
+            <Skeleton className="h-10 w-full bg-accent" />
+        </div>
+    );
+    if (isPopover) return <div className="p-1">{SkeletonLoader}</div>;
+    return <Card className="shadow-2xl max-w-4xl mx-auto"><CardContent className="p-6">{SkeletonLoader}</CardContent></Card>;
+  }
+  
   const FormContent = (
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className={cn(
