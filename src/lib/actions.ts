@@ -72,12 +72,14 @@ export async function guestLoginAction(values: z.infer<typeof guestLoginSchema>)
     }
 
     await createSession(booking.id, 'guest');
+    redirect('/dashboard');
   } catch (e: any) {
+    if (e.digest?.includes('NEXT_REDIRECT')) {
+        throw e;
+    }
     console.error('Guest login error:', e);
     return { error: e.message || 'An unexpected error occurred.' };
   }
-  
-  redirect('/dashboard');
 }
 
 const adminLoginSchema = z.object({
@@ -106,12 +108,14 @@ export async function adminLoginAction(values: z.infer<typeof adminLoginSchema>)
         }
 
         await createSession(admin.id, 'admin');
+        redirect('/dashboard/admin');
     } catch (e: any) {
+        if (e.digest?.includes('NEXT_REDIRECT')) {
+            throw e;
+        }
         console.error('Admin login error:', e);
         return { error: e.message || 'An unexpected error occurred.' };
     }
-    
-    redirect('/dashboard/admin');
 }
 
 const adminRegisterSchema = z.object({
@@ -128,32 +132,34 @@ export async function adminRegisterAction(
     try {
         const validatedData = adminRegisterSchema.safeParse(values);
         if (!validatedData.success) {
-        const firstError = validatedData.error.errors[0].message;
-        return { error: firstError };
+            const firstError = validatedData.error.errors[0].message;
+            return { error: firstError };
         }
 
         const { email, password } = validatedData.data;
 
         const existingAdmin = await findAdminByEmail(email);
         if (existingAdmin) {
-        return {
-            error: 'An admin with this email already exists.',
-        };
+            return {
+                error: 'An admin with this email already exists.',
+            };
         }
 
         const passwordHash = await bcrypt.hash(password, 10);
         const adminId = await createAdminUserInFirestore(email, passwordHash);
 
         await createSession(adminId, 'admin');
+        redirect('/dashboard/admin');
     } catch (e: any) {
+        if (e.digest?.includes('NEXT_REDIRECT')) {
+            throw e;
+        }
         console.error('Admin registration error:', e);
         return {
-        error:
-            e.message || 'An unexpected error occurred during registration.',
+            error:
+                e.message || 'An unexpected error occurred during registration.',
         };
     }
-
-    redirect('/dashboard/admin');
 }
 
 export async function logoutAction() {
@@ -200,12 +206,14 @@ export async function createBookingAction(values: z.infer<typeof createBookingSc
                 isRead: false,
             });
         }
+        redirect('/login?booking=success');
     } catch(e: any) {
+        if (e.digest?.includes('NEXT_REDIRECT')) {
+            throw e;
+        }
         console.error('Booking creation error:', e);
         return { error: e.message || 'An unexpected error occurred.' };
     }
-
-    redirect('/login?booking=success');
 }
 
 const contactFormSchema = z.object({
