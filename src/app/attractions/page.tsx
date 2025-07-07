@@ -1,0 +1,38 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { attractions } from "@/lib/mock-data";
+import { AttractionsMap } from "@/components/AttractionsMap";
+
+export default function AttractionsPage() {
+  return (
+    <div className="container mx-auto px-4 py-16">
+      <div className="text-center mb-12">
+        <h1 className="text-5xl font-headline">Explore the Neighborhood</h1>
+        <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
+          SereneStay is perfectly situated to offer you the best of the city, from cultural landmarks to natural retreats.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-1 flex flex-col gap-4">
+          {attractions.map((attraction) => {
+            const Icon = attraction.icon;
+            return (
+              <Card key={attraction.name} className="flex items-center p-4">
+                <Icon className="w-8 h-8 mr-4 text-accent-foreground flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold">{attraction.name}</h3>
+                  <p className="text-sm text-muted-foreground">{attraction.distance}</p>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
+        <div className="lg:col-span-2">
+            <Card className="overflow-hidden h-full">
+                <AttractionsMap />
+            </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
