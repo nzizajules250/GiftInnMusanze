@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { saveRoomAction } from "@/lib/actions";
 import { Loader2, PlusCircle, Trash2 } from "lucide-react";
 import type { Room } from "@/lib/types";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const imageSchema = z.object({
   url: z.string().url("Please enter a valid image URL."),
@@ -110,46 +111,48 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
             
             <div className="space-y-4">
               <FormLabel>Images</FormLabel>
-              <div className="space-y-2">
-                {fields.map((field, index) => (
-                  <div key={field.id} className="flex items-end gap-2 p-3 border rounded-lg bg-muted/50">
-                    <div className="flex-grow space-y-2">
-                      <FormField
-                        control={form.control}
-                        name={`images.${index}.url`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-xs font-normal">Image URL</FormLabel>
-                            <FormControl><Input {...field} placeholder="https://example.com/image.png" /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name={`images.${index}.hint`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="text-xs font-normal">Image AI Hint</FormLabel>
-                            <FormControl><Input {...field} placeholder="e.g. hotel room" /></FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+              <ScrollArea className="h-72 w-full rounded-md border">
+                <div className="p-4 space-y-2">
+                  {fields.map((field, index) => (
+                    <div key={field.id} className="flex items-end gap-2 p-3 border rounded-lg bg-muted/50">
+                      <div className="flex-grow space-y-2">
+                        <FormField
+                          control={form.control}
+                          name={`images.${index}.url`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs font-normal">Image URL</FormLabel>
+                              <FormControl><Input {...field} placeholder="https://example.com/image.png" /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                        <FormField
+                          control={form.control}
+                          name={`images.${index}.hint`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="text-xs font-normal">Image AI Hint</FormLabel>
+                              <FormControl><Input {...field} placeholder="e.g. hotel room" /></FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => remove(index)}
+                        disabled={fields.length <= 1}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Remove Image</span>
+                      </Button>
                     </div>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => remove(index)}
-                      disabled={fields.length <= 1}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      <span className="sr-only">Remove Image</span>
-                    </Button>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </ScrollArea>
 
               <Button
                 type="button"

@@ -22,6 +22,7 @@ import { saveAmenityAction } from "@/lib/actions";
 import { Loader2 } from "lucide-react";
 import type { Amenity } from "@/lib/types";
 import { availableIcons } from "@/lib/icons";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters."),
@@ -79,30 +80,34 @@ export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenit
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField control={form.control} name="title" render={({ field }) => (
-                <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-            )}/>
-            <FormField control={form.control} name="description" render={({ field }) => (
-                <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
-            )}/>
-            <FormField control={form.control} name="details" render={({ field }) => (
-                <FormItem><FormLabel>Details</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-            )}/>
-            <FormField control={form.control} name="icon" render={({ field }) => (
-                <FormItem><FormLabel>Icon</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger><SelectValue placeholder="Select an icon" /></SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {availableIcons.map(iconName => (
-                      <SelectItem key={iconName} value={iconName}>{iconName}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-                </FormItem>
-            )}/>
+             <ScrollArea className="max-h-[60vh]">
+                <div className="space-y-4 pr-6">
+                  <FormField control={form.control} name="title" render={({ field }) => (
+                      <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                  )}/>
+                  <FormField control={form.control} name="description" render={({ field }) => (
+                      <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                  )}/>
+                  <FormField control={form.control} name="details" render={({ field }) => (
+                      <FormItem><FormLabel>Details</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
+                  )}/>
+                  <FormField control={form.control} name="icon" render={({ field }) => (
+                      <FormItem><FormLabel>Icon</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger><SelectValue placeholder="Select an icon" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {availableIcons.map(iconName => (
+                            <SelectItem key={iconName} value={iconName}>{iconName}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                      </FormItem>
+                  )}/>
+                </div>
+              </ScrollArea>
             <DialogFooter>
               <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
               <Button type="submit" disabled={loading}>
