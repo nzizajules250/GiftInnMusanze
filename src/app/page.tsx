@@ -65,8 +65,8 @@ export default async function Home() {
         <h2 className="text-4xl font-headline text-center mb-12">
           Our Accommodations
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {rooms.slice(0, 3).map((room) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {rooms.slice(0, 9).map((room) => (
             <RoomCard key={room.id} room={room} />
           ))}
         </div>
