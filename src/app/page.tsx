@@ -11,7 +11,7 @@ import { getRooms, getAmenities } from "@/lib/firebase-service";
 import { RoomCard } from "@/components/RoomCard";
 import { AmenityCard } from "@/components/AmenityCard";
 import { RecommendationEngine } from "@/components/RecommendationEngine";
-import { Card } from "@/components/ui/card";
+import { AnimatedTitle } from "@/components/AnimatedTitle";
 
 const heroImages = [
   { src: "https://placehold.co/1600x800.png", alt: "Modern hotel lobby with elegant seating", hint: "hotel lobby" },
@@ -47,9 +47,10 @@ export default async function Home() {
           <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 hidden md:flex" />
         </Carousel>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4 z-10">
-          <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl drop-shadow-lg">
-            Welcome to SereneStay
-          </h1>
+          <AnimatedTitle 
+            text="Welcome to SereneStay" 
+            className="font-headline text-5xl md:text-7xl lg:text-8xl drop-shadow-lg"
+          />
           <p className="mt-4 text-lg md:text-2xl max-w-2xl drop-shadow-md">
             Your exclusive sanctuary for peace and luxury.
           </p>

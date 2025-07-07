@@ -63,6 +63,24 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-headline;
+  }
+}
+
+@layer utilities {
+  .perspective {
+    perspective: 1000px;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
   }
 }

@@ -4,6 +4,21 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { Belleza, Literata } from "next/font/google";
+
+const belleza = Belleza({
+  subsets: ["latin"],
+  display: "swap",
+  weight: "400",
+  variable: "--font-belleza",
+});
+
+const literata = Literata({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-literata",
+});
+
 
 export const metadata: Metadata = {
   title: "SereneStay",
@@ -21,7 +36,9 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          "min-h-screen bg-background font-body antialiased"
+          "min-h-screen bg-background antialiased",
+          belleza.variable,
+          literata.variable
         )}
       >
         <div className="relative flex min-h-screen flex-col">
