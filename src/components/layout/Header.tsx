@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { getSession } from "@/lib/auth";
 import { logoutAction } from "@/lib/actions";
 import { NotificationBell } from "./NotificationBell";
@@ -76,6 +76,7 @@ export default async function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="pr-0 pt-12">
+              <SheetTitle className="sr-only">Menu</SheetTitle>
               <Link href="/" className="flex items-center mb-8 px-6">
                 <span className="font-bold font-headline text-2xl">Gift Inn</span>
               </Link>
