@@ -10,7 +10,7 @@ export default async function AttractionsPage() {
       <div className="text-center mb-12">
         <h1 className="text-5xl font-headline">Explore the Neighborhood</h1>
         <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
-          SereneStay is perfectly situated to offer you the best of the city, from cultural landmarks to natural retreats.
+          Gift Inn is perfectly situated to offer you the best of the city, from cultural landmarks to natural retreats.
         </p>
       </div>
 

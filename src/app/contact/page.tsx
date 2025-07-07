@@ -49,7 +49,7 @@ export default function ContactPage() {
                 <Mail className="w-6 h-6 text-accent-foreground mt-1" />
                 <div>
                   <h3 className="font-semibold">Email</h3>
-                  <p className="text-muted-foreground">reservations@serenestay.com</p>
+                  <p className="text-muted-foreground">reservations@giftinn.com</p>
                 </div>
               </div>
             </CardContent>

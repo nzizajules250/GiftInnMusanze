@@ -48,7 +48,7 @@ export default async function Home() {
         </Carousel>
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4 z-10">
           <AnimatedTitle 
-            text="Welcome to SereneStay" 
+            text="Welcome to Gift Inn" 
             className="font-headline text-5xl md:text-7xl lg:text-8xl drop-shadow-lg"
           />
           <p className="mt-4 text-lg md:text-2xl max-w-2xl drop-shadow-md">

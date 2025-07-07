@@ -22,7 +22,7 @@ export default async function SettingsPage() {
             <Card>
                 <CardHeader>
                     <CardTitle>Notification Settings</CardTitle>
-                    <CardDescription>Manage how you receive notifications from SereneStay.</CardDescription>
+                    <CardDescription>Manage how you receive notifications from Gift Inn.</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <SettingsForm userSettings={userSettings} />

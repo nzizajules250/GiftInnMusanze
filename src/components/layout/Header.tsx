@@ -23,7 +23,7 @@ export default async function Header() {
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <span className="font-bold sm:inline-block font-headline text-2xl">
-              SereneStay
+              Gift Inn
             </span>
           </Link>
         </div>
@@ -74,7 +74,7 @@ export default async function Header() {
             </SheetTrigger>
             <SheetContent side="left" className="pr-0 pt-12">
               <Link href="/" className="flex items-center mb-8 px-6">
-                <span className="font-bold font-headline text-2xl">SereneStay</span>
+                <span className="font-bold font-headline text-2xl">Gift Inn</span>
               </Link>
               <div className="flex flex-col space-y-4">
                 {[...navLinks, ...(session ? [{href: "/dashboard", label: "Dashboard"}] : [])].map(({ href, label }) => (

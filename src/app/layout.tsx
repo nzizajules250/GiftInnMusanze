@@ -21,8 +21,8 @@ const literata = Literata({
 
 
 export const metadata: Metadata = {
-  title: "SereneStay",
-  description: "Experience tranquility and luxury at SereneStay, your home away from home.",
+  title: "Gift Inn",
+  description: "Experience tranquility and luxury at Gift Inn, your home away from home.",
 };
 
 export default function RootLayout({
