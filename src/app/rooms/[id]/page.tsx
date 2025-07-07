@@ -25,7 +25,7 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
                         <CarouselContent>
                             {room.images.map((image, index) => (
                                 <CarouselItem key={index}>
-                                    <div className="relative w-full h-[500px]">
+                                    <div className="relative w-full h-[300px] md:h-[500px]">
                                         <Image
                                             src={image.url}
                                             alt={`View ${index + 1} of ${room.name}`}
@@ -39,7 +39,7 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
                             ))}
                             {room.images.length === 0 && (
                                 <CarouselItem>
-                                    <div className="relative w-full h-[500px]">
+                                    <div className="relative w-full h-[300px] md:h-[500px]">
                                         <Image
                                             src="https://placehold.co/800x500.png"
                                             alt="Placeholder image"

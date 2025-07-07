@@ -27,15 +27,17 @@ export default async function AdminDashboardPage() {
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
 
             <Tabs defaultValue="overview" className="flex flex-col">
-                <TabsList className="grid w-full grid-cols-5">
-                    <TabsTrigger value="overview">Overview</TabsTrigger>
-                    <TabsTrigger value="rooms">Rooms</TabsTrigger>
-                    <TabsTrigger value="amenities">Amenities</TabsTrigger>
-                    <TabsTrigger value="bookings">Bookings</TabsTrigger>
-                    <TabsTrigger value="messages">
-                        Messages {unreadMessages > 0 && <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{unreadMessages}</span>}
-                    </TabsTrigger>
-                </TabsList>
+                <div className="w-full overflow-x-auto">
+                    <TabsList>
+                        <TabsTrigger value="overview">Overview</TabsTrigger>
+                        <TabsTrigger value="rooms">Rooms</TabsTrigger>
+                        <TabsTrigger value="amenities">Amenities</TabsTrigger>
+                        <TabsTrigger value="bookings">Bookings</TabsTrigger>
+                        <TabsTrigger value="messages">
+                            Messages {unreadMessages > 0 && <span className="ml-2 bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{unreadMessages}</span>}
+                        </TabsTrigger>
+                    </TabsList>
+                </div>
 
                 <TabsContent value="overview" className="space-y-4 mt-4">
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

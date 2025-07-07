@@ -6,6 +6,7 @@ import { getSession } from "@/lib/auth";
 import { logoutAction } from "@/lib/actions";
 import { NotificationBell } from "./NotificationBell";
 import { ModeToggle } from "./ModeToggle";
+import { Separator } from "@/components/ui/separator";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -78,28 +79,29 @@ export default async function Header() {
               <Link href="/" className="flex items-center mb-8 px-6">
                 <span className="font-bold font-headline text-2xl">Gift Inn</span>
               </Link>
-              <div className="flex flex-col space-y-4">
+              <div className="flex flex-col space-y-3">
                 {[...navLinks, ...(session ? [{href: "/dashboard", label: "Dashboard"}] : [])].map(({ href, label }) => (
                   <Link
                     key={href}
                     href={href}
-                    className="text-lg font-medium px-6 py-2 hover:bg-primary rounded-l-full"
+                    className="text-lg font-medium px-6 py-2 hover:bg-primary/80 rounded-l-full transition-colors"
                   >
                     {label}
                   </Link>
                 ))}
               </div>
-              <div className="mt-8 px-6 flex flex-col space-y-2">
+              <Separator className="my-6" />
+              <div className="px-6 flex flex-col space-y-3">
                  {session ? (
                      <form action={logoutAction}>
-                        <Button type="submit" className="w-full">Logout</Button>
+                        <Button type="submit" className="w-full justify-start" variant="outline">Logout</Button>
                     </form>
                  ) : (
                     <>
-                        <Button asChild className="w-full">
+                        <Button asChild className="w-full justify-start">
                            <Link href="/login">Login</Link>
                         </Button>
-                        <Button asChild variant="outline" className="w-full">
+                        <Button asChild variant="outline" className="w-full justify-start">
                            <Link href="/register">Admin Register</Link>
                         </Button>
                     </>

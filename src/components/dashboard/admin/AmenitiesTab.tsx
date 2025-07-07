@@ -58,7 +58,7 @@ export function AmenitiesTab({ amenities }: { amenities: Amenity[] }) {
                             <TableRow>
                                 <TableHead>Icon</TableHead>
                                 <TableHead>Title</TableHead>
-                                <TableHead>Description</TableHead>
+                                <TableHead className="hidden md:table-cell">Description</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -69,7 +69,7 @@ export function AmenitiesTab({ amenities }: { amenities: Amenity[] }) {
                                     <TableRow key={amenity.id}>
                                         <TableCell><Icon className="w-6 h-6" /></TableCell>
                                         <TableCell>{amenity.title}</TableCell>
-                                        <TableCell>{amenity.description}</TableCell>
+                                        <TableCell className="hidden md:table-cell">{amenity.description}</TableCell>
                                         <TableCell className="text-right space-x-2">
                                             <Button variant="outline" size="sm" onClick={() => handleEdit(amenity)}>Edit</Button>
                                             <Button variant="destructive" size="sm" onClick={() => setDeletingAmenity(amenity)}>Delete</Button>

@@ -35,14 +35,14 @@ export function MessagesTab({ messages: initialMessages }: { messages: ContactMe
                 <Accordion type="multiple" className="w-full">
                     {messages.sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime()).map((message) => (
                         <AccordionItem value={message.id} key={message.id}>
-                            <AccordionTrigger className="w-full">
-                                <div className="flex justify-between w-full pr-4">
-                                    <div className="flex items-center gap-4">
+                            <AccordionTrigger className="w-full text-left hover:no-underline">
+                               <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center justify-between w-full pr-4">
+                                    <div className="flex items-center gap-2 truncate">
                                         {!message.isRead && <Badge>New</Badge>}
-                                        <span className="font-semibold">{message.name}</span>
-                                        <span className="text-muted-foreground">{message.email}</span>
+                                        <span className="font-semibold truncate">{message.name}</span>
+                                        <span className="text-muted-foreground hidden md:inline truncate">{message.email}</span>
                                     </div>
-                                    <span className="text-sm text-muted-foreground">{format(message.createdAt, "PPP p")}</span>
+                                    <span className="text-sm text-muted-foreground flex-shrink-0">{format(message.createdAt, "PP p")}</span>
                                 </div>
                             </AccordionTrigger>
                             <AccordionContent>
