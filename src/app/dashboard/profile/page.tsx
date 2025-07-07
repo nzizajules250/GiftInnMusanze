@@ -3,7 +3,6 @@ import { getUserProfile } from "@/lib/firebase-service";
 import { redirect } from "next/navigation";
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import { ProfileForm } from "@/components/dashboard/ProfileForm";
 
 export default async function ProfilePage() {
@@ -26,7 +25,6 @@ export default async function ProfilePage() {
                     <div className="flex-grow">
                         <CardTitle className="text-2xl">{user.name}</CardTitle>
                         <CardDescription>{user.email}</CardDescription>
-                        <Button variant="outline" size="sm" className="mt-4">Change Photo</Button>
                     </div>
                 </CardHeader>
                 <CardContent>

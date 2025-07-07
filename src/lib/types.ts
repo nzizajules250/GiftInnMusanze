@@ -39,6 +39,7 @@ export type Booking = {
   checkOut: Date;
   status: 'Confirmed' | 'Pending' | 'Cancelled';
   total: number;
+  avatar?: string;
 };
 
 export type Admin = {
@@ -46,6 +47,7 @@ export type Admin = {
     email: string;
     passwordHash: string;
     name: string;
+    avatar?: string;
 }
 
 export type SessionPayload = {

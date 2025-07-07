@@ -103,7 +103,7 @@ export async function getUserProfile(session: SessionPayload): Promise<UserProfi
             return {
                 name: adminData.name || "Administrator",
                 email: adminData.email,
-                avatar: "https://placehold.co/100x100.png"
+                avatar: adminData.avatar || "https://placehold.co/100x100.png"
             }
         }
     }
@@ -116,7 +116,7 @@ export async function getUserProfile(session: SessionPayload): Promise<UserProfi
             return {
                 name: bookingData.guestName,
                 email: "Guest Account (no email)",
-                avatar: "https://placehold.co/100x100.png"
+                avatar: bookingData.avatar || "https://placehold.co/100x100.png"
             }
         }
     }
@@ -172,18 +172,22 @@ export async function createAdminUserInFirestore(email: string, passwordHash: st
     return docRef.id;
 }
 
-export async function updateUserProfile(session: SessionPayload, data: { name?: string; passwordHash?: string }) {
+export async function updateUserProfile(session: SessionPayload, data: { name?: string; passwordHash?: string; avatar?: string; }) {
     if (session.role === 'admin') {
-        if (!data.name && !data.passwordHash) return;
+        if (!data.name && !data.passwordHash && data.avatar === undefined) return;
         const adminDocRef = doc(db, 'admins', session.userId);
-        const updateData: { name?: string, passwordHash?: string } = {};
+        const updateData: { name?: string, passwordHash?: string, avatar?: string } = {};
         if (data.name) updateData.name = data.name;
         if (data.passwordHash) updateData.passwordHash = data.passwordHash;
+        if (data.avatar !== undefined) updateData.avatar = data.avatar;
         await updateDoc(adminDocRef, updateData);
     } else if (session.role === 'guest') {
-        if (!data.name) return;
+        if (!data.name && data.avatar === undefined) return;
         const bookingDocRef = doc(db, 'bookings', session.userId);
-        await updateDoc(bookingDocRef, { guestName: data.name });
+        const updateData: { guestName?: string, avatar?: string } = {};
+        if(data.name) updateData.guestName = data.name;
+        if(data.avatar !== undefined) updateData.avatar = data.avatar;
+        await updateDoc(bookingDocRef, updateData);
     }
 }
 

@@ -375,16 +375,22 @@ export async function markNotificationsAsReadAction(userId: string) {
 
 const profileFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
+  avatar: z.string().url("Please enter a valid image URL.").or(z.literal("")).optional(),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),
-}).refine(data => {
-    if (data.newPassword && !data.currentPassword) return false;
-    return true;
-}, { message: "Current password is required to set a new password.", path: ["currentPassword"] })
-  .refine(data => {
-    if (data.newPassword && data.newPassword.length < 8) return false;
-    return true;
-}, { message: "New password must be at least 8 characters.", path: ["newPassword"] });
+  confirmPassword: z.string().optional(),
+}).refine(data => data.newPassword === data.confirmPassword, {
+    message: "New passwords do not match.",
+    path: ["confirmPassword"],
+})
+.refine(data => !data.newPassword || data.newPassword.length >= 8, {
+    message: "New password must be at least 8 characters.",
+    path: ["newPassword"],
+})
+.refine(data => !data.newPassword || !!data.currentPassword, {
+    message: "Current password is required to set a new one.",
+    path: ["currentPassword"],
+});
 
 
 export async function updateUserProfileAction(values: z.infer<typeof profileFormSchema>) {
@@ -397,8 +403,12 @@ export async function updateUserProfileAction(values: z.infer<typeof profileForm
             return { success: false, error: validatedData.error.errors[0].message };
         }
 
-        const { name, currentPassword, newPassword } = validatedData.data;
-        const updatePayload: { name?: string; passwordHash?: string } = { name };
+        const { name, avatar, currentPassword, newPassword } = validatedData.data;
+        const updatePayload: { name?: string; passwordHash?: string; avatar?: string; } = { name };
+        
+        if (avatar !== undefined) {
+            updatePayload.avatar = avatar;
+        }
 
         if (session.role === 'admin' && newPassword && currentPassword) {
             const admin = await findAdminByEmail(session.email);

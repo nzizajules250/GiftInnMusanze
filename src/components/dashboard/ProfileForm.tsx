@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { updateUserProfileAction } from "@/lib/actions";
@@ -14,6 +14,7 @@ import type { SessionPayload, UserProfile } from "@/lib/types";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
+  avatar: z.string().url("Please enter a valid image URL.").or(z.literal("")).optional(),
   currentPassword: z.string().optional(),
   newPassword: z.string().optional(),
   confirmPassword: z.string().optional(),
@@ -45,6 +46,7 @@ export function ProfileForm({ user, session }: ProfileFormProps) {
         resolver: zodResolver(formSchema),
         defaultValues: {
           name: user.name,
+          avatar: user.avatar.startsWith('https://placehold.co') ? '' : user.avatar,
           currentPassword: "",
           newPassword: "",
           confirmPassword: "",
@@ -99,6 +101,21 @@ export function ProfileForm({ user, session }: ProfileFormProps) {
                         </FormControl>
                     </FormItem>
                 </div>
+                
+                <FormField
+                    control={form.control}
+                    name="avatar"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Avatar URL</FormLabel>
+                            <FormControl>
+                                <Input placeholder="https://example.com/your-image.png" {...field} />
+                            </FormControl>
+                            <FormDescription>Enter a URL to a new profile picture. Leave blank to use default.</FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
                 {!isGuest && (
                     <>
