@@ -5,6 +5,12 @@ import type { SessionPayload } from './types';
 import { redirect } from 'next/navigation';
 
 const secretKey = process.env.JWT_SECRET_KEY;
+
+// Throw an error during build or at server start if the key is missing.
+if (!secretKey) {
+  throw new Error('JWT_SECRET_KEY is not set in environment variables. Please add it to your .env file.');
+}
+
 const encodedKey = new TextEncoder().encode(secretKey);
 const aDay = 24 * 60 * 60 * 1000;
 
@@ -43,6 +49,7 @@ export async function getSession(): Promise<SessionPayload | null> {
     });
     return payload as SessionPayload;
   } catch (error) {
+    // This will effectively log out the user with an invalid token.
     console.error('Failed to verify session:', error);
     return null;
   }
