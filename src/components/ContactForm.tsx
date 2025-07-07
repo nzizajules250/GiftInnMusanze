@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -16,6 +17,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
+import { contactFormAction } from "@/lib/actions"
+import { Loader2 } from "lucide-react"
 
 const formSchema = z.object({
   name: z.string().min(2, {
@@ -31,23 +34,34 @@ const formSchema = z.object({
 
 export function ContactForm() {
     const { toast } = useToast()
+    const [loading, setLoading] = useState(false)
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      message: "",
-    },
-  })
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-    toast({
-      title: "Message Sent!",
-      description: "Thank you for contacting us. We will be in touch shortly.",
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+          name: "",
+          email: "",
+          message: "",
+        },
     })
-    form.reset()
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoading(true)
+    const result = await contactFormAction(values);
+    if (result.success) {
+        toast({
+            title: "Message Sent!",
+            description: "Thank you for contacting us. We will be in touch shortly.",
+        })
+        form.reset()
+    } else {
+        toast({
+            title: "Error",
+            description: result.error,
+            variant: "destructive",
+        })
+    }
+    setLoading(false)
   }
 
   return (
@@ -97,7 +111,10 @@ export function ContactForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">Submit</Button>
+        <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={loading}>
+            {loading && <Loader2 className="animate-spin mr-2" />}
+            Submit
+        </Button>
       </form>
     </Form>
   )

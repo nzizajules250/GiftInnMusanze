@@ -1,17 +1,33 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { getSession } from "@/lib/auth";
+import { getUserProfile } from "@/lib/firebase-service";
+import { redirect } from "next/navigation";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
+import { SettingsForm } from "@/components/dashboard/settings/SettingsForm";
 
-export default function SettingsPage() {
-  return (
-    <div>
-      <h1 className="text-3xl font-bold mb-8">Settings</h1>
-      <Card>
-        <CardHeader>
-          <CardTitle>Application Settings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>This is where you would manage your application settings.</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
+export default async function SettingsPage() {
+    const session = await getSession();
+    if (!session) {
+        redirect('/login');
+    }
+
+    // In a real app, you'd fetch user settings from the database
+    const userSettings = {
+        emailNotifications: true,
+        pushNotifications: false,
+    };
+
+    return (
+        <div className="flex flex-col gap-8">
+            <h1 className="text-3xl font-bold">Settings</h1>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Notification Settings</CardTitle>
+                    <CardDescription>Manage how you receive notifications from SereneStay.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <SettingsForm userSettings={userSettings} />
+                </CardContent>
+            </Card>
+        </div>
+    );
 }

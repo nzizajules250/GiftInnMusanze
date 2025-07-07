@@ -1,12 +1,12 @@
 import { db } from './firebase';
-import { collection, getDocs, query, where, addDoc, doc, getDoc, updateDoc, deleteDoc, setDoc } from 'firebase/firestore';
-import type { Room, Booking, Amenity, Attraction, Admin, SessionPayload } from './types';
+import { collection, getDocs, query, where, addDoc, doc, getDoc, updateDoc, deleteDoc, setDoc, Timestamp, writeBatch } from 'firebase/firestore';
+import type { Room, Booking, Amenity, Attraction, Admin, SessionPayload, ContactMessage, Notification } from './types';
 import { getIcon } from './icons';
 
 const parseDocWithDateConversion = (doc: any) => {
     const data = doc.data();
     for (const key in data) {
-        if (data[key] && typeof data[key].toDate === 'function') {
+        if (data[key] instanceof Timestamp) {
             data[key] = data[key].toDate();
         }
     }
@@ -146,6 +146,12 @@ export async function findAdminByEmail(email: string): Promise<Admin | null> {
     return parseDocWithDateConversion(snapshot.docs[0]) as Admin;
 }
 
+export async function findAdmins(): Promise<Admin[]> {
+    const adminsCollection = collection(db, 'admins');
+    const adminsSnapshot = await getDocs(adminsCollection);
+    return adminsSnapshot.docs.map(doc => parseDocWithDateConversion(doc)) as Admin[];
+}
+
 export async function createAdminUserInFirestore(email: string, passwordHash: string): Promise<string> {
     const adminsCollection = collection(db, 'admins');
     const docRef = await addDoc(adminsCollection, { email, passwordHash });
@@ -193,4 +199,59 @@ export async function deleteAmenity(amenityId: string) {
 export async function updateBookingStatus(bookingId: string, status: Booking['status']) {
     const bookingDocRef = doc(db, 'bookings', bookingId);
     await updateDoc(bookingDocRef, { status });
+}
+
+
+// --- Contact Messages ---
+type NewContactMessage = Omit<ContactMessage, 'id' | 'createdAt' | 'isRead'>;
+
+export async function saveContactMessage(message: NewContactMessage): Promise<string> {
+    const docRef = await addDoc(collection(db, 'contactMessages'), {
+        ...message,
+        createdAt: Timestamp.now(),
+        isRead: false
+    });
+    return docRef.id;
+}
+
+export async function getMessagesForAdmin(): Promise<ContactMessage[]> {
+    const messagesCollection = collection(db, 'contactMessages');
+    const messagesSnapshot = await getDocs(messagesCollection);
+    const messagesList = messagesSnapshot.docs.map(doc => parseDocWithDateConversion(doc));
+    return messagesList as ContactMessage[];
+}
+
+export async function markMessageAsRead(messageId: string): Promise<void> {
+    const messageDocRef = doc(db, 'contactMessages', messageId);
+    await updateDoc(messageDocRef, { isRead: true });
+}
+
+// --- Notifications ---
+type NewNotification = Omit<Notification, 'id' | 'createdAt'>;
+
+export async function createNotification(notification: NewNotification): Promise<string> {
+    const docRef = await addDoc(collection(db, 'notifications'), {
+        ...notification,
+        createdAt: Timestamp.now(),
+    });
+    return docRef.id;
+}
+
+export async function markNotificationsAsRead(userId: string): Promise<void> {
+    const q = query(collection(db, 'notifications'), 
+        where('userId', '==', userId), 
+        where('isRead', '==', false)
+    );
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+        return;
+    }
+
+    const batch = writeBatch(db);
+    snapshot.docs.forEach(doc => {
+        batch.update(doc.ref, { isRead: true });
+    });
+
+    await batch.commit();
 }

@@ -48,3 +48,21 @@ export type SessionPayload = {
     role: 'admin' | 'guest';
     expires: Date;
 };
+
+export type ContactMessage = {
+    id: string;
+    name: string;
+    email: string;
+    message: string;
+    createdAt: Date;
+    isRead: boolean;
+}
+
+export type Notification = {
+    id: string;
+    userId: string; // The user who should receive the notification
+    message: string;
+    href: string; // Link to the relevant page (e.g., a booking)
+    createdAt: Date;
+    isRead: boolean;
+}

@@ -15,6 +15,11 @@ import {
   saveAmenity,
   deleteAmenity,
   updateBookingStatus,
+  saveContactMessage,
+  markMessageAsRead,
+  findAdmins,
+  createNotification,
+  markNotificationsAsRead
 } from './firebase-service';
 import { createSession, deleteSession } from './auth';
 import bcrypt from 'bcryptjs';
@@ -163,7 +168,7 @@ export async function adminRegisterAction(
 }
 
 export async function logoutAction() {
-  deleteSession();
+  await deleteSession();
 }
 
 
@@ -183,6 +188,7 @@ const createBookingSchema = z.object({
 
 export async function createBookingAction(values: z.infer<typeof createBookingSchema>) {
     let success = false;
+    let bookingId;
     try {
         const validatedData = createBookingSchema.safeParse(values);
         if (!validatedData.success) {
@@ -194,9 +200,20 @@ export async function createBookingAction(values: z.infer<typeof createBookingSc
             status: 'Pending' as const,
         }
 
-        await createBooking(bookingData);
-        success = true;
+        bookingId = await createBooking(bookingData);
 
+        // Notify all admins about the new booking
+        const admins = await findAdmins();
+        for (const admin of admins) {
+            await createNotification({
+                userId: admin.id,
+                message: `New booking for ${bookingData.roomName} by ${bookingData.guestName}.`,
+                href: `/dashboard/admin?tab=bookings`,
+                isRead: false,
+            });
+        }
+        
+        success = true;
     } catch(e: any) {
         console.error('Booking creation error:', e);
         return { success: false, error: e.message || 'An unexpected error occurred.' };
@@ -204,6 +221,40 @@ export async function createBookingAction(values: z.infer<typeof createBookingSc
 
     if (success) {
         redirect('/login?booking=success');
+    }
+}
+
+const contactFormSchema = z.object({
+    name: z.string().min(2, "Name must be at least 2 characters."),
+    email: z.string().email("Please enter a valid email address."),
+    message: z.string().min(10, "Message must be at least 10 characters."),
+});
+
+export async function contactFormAction(values: z.infer<typeof contactFormSchema>) {
+    try {
+        const validatedData = contactFormSchema.safeParse(values);
+        if (!validatedData.success) {
+            return { success: false, error: validatedData.error.errors[0].message };
+        }
+
+        await saveContactMessage(validatedData.data);
+        
+        // Notify all admins
+        const admins = await findAdmins();
+        for (const admin of admins) {
+            await createNotification({
+                userId: admin.id,
+                message: `New message from ${validatedData.data.name}.`,
+                href: `/dashboard/admin?tab=messages`,
+                isRead: false,
+            });
+        }
+        
+        revalidatePath('/dashboard/admin');
+        return { success: true };
+    } catch (e: any) {
+        console.error('Contact form error:', e);
+        return { success: false, error: e.message || 'An unexpected error occurred.' };
     }
 }
 
@@ -269,4 +320,44 @@ export async function updateBookingStatusAction(bookingId: string, status: Booki
         console.error('Update booking status error:', e);
         return { success: false, error: e.message };
     }
+}
+
+
+export async function markMessageAsReadAction(messageId: string) {
+    try {
+        await markMessageAsRead(messageId);
+        revalidatePath('/dashboard/admin');
+        return { success: true };
+    } catch (e: any) {
+        console.error('Mark message as read error:', e);
+        return { success: false, error: e.message };
+    }
+}
+
+export async function markNotificationsAsReadAction(userId: string) {
+    try {
+        await markNotificationsAsRead(userId);
+        revalidatePath('/dashboard'); // revalidate header
+        return { success: true };
+    } catch (e: any) {
+        console.error('Mark notifications as read error:', e);
+        return { success: false, error: e.message };
+    }
+}
+
+const userSettingsSchema = z.object({
+  emailNotifications: z.boolean(),
+  pushNotifications: z.boolean(),
+});
+
+export async function updateUserSettingsAction(values: z.infer<typeof userSettingsSchema>) {
+    console.log("Updating user settings (simulated):", values);
+    // In a real app, you would save these settings to the user's profile in Firebase.
+    // For now, we'll just simulate a successful save.
+    
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    revalidatePath('/dashboard/settings');
+    return { success: true };
 }

@@ -1,4 +1,4 @@
-import { Wifi, Dumbbell, Waves, Utensils, Sparkles, Building, Trees, ShoppingBag, MapPin, Wine } from 'lucide-react';
+import { Wifi, Dumbbell, Waves, Utensils, Sparkles, Building, Trees, ShoppingBag, MapPin, Wine, MessageSquare } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
 export const iconMap: { [key: string]: LucideIcon } = {
@@ -12,6 +12,7 @@ export const iconMap: { [key: string]: LucideIcon } = {
     MapPin,
     Wifi,
     Wine,
+    MessageSquare,
 };
 
 export const availableIcons = Object.keys(iconMap);
