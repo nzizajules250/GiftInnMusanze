@@ -4,7 +4,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useEffect, useState, useId } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -41,7 +41,6 @@ interface ManageAmenityDialogProps {
 export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenityDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const formId = useId();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { title: "", description: "", details: "", icon: "Wifi" },
@@ -77,13 +76,13 @@ export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenit
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-lg flex flex-col max-h-[90vh]">
-        <DialogHeader>
+        <DialogHeader className="flex-shrink-0">
           <DialogTitle>{amenity ? "Edit Amenity" : "Add New Amenity"}</DialogTitle>
         </DialogHeader>
-        <div className="flex-grow overflow-hidden">
-            <ScrollArea className="h-full pr-6">
-                <Form {...form}>
-                <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex-1 flex flex-col overflow-y-hidden gap-4">
+            <ScrollArea className="flex-1 pr-6">
+                <div className="space-y-4">
                     <FormField control={form.control} name="title" render={({ field }) => (
                         <FormItem><FormLabel>Title</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                     )}/>
@@ -108,17 +107,17 @@ export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenit
                         <FormMessage />
                         </FormItem>
                     )}/>
-                </form>
-                </Form>
+                </div>
             </ScrollArea>
-        </div>
-        <DialogFooter className="flex-shrink-0 pt-4 border-t">
-            <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
-            <Button type="submit" form={formId} disabled={loading}>
-            {loading && <Loader2 className="animate-spin mr-2" />}
-            Save
-            </Button>
-        </DialogFooter>
+            <DialogFooter className="pt-4 border-t flex-shrink-0">
+                <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
+                <Button type="submit" disabled={loading}>
+                    {loading && <Loader2 className="animate-spin mr-2" />}
+                    Save
+                </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
