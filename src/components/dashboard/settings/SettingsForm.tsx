@@ -4,7 +4,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -34,11 +34,46 @@ interface SettingsFormProps {
 export function SettingsForm({ userSettings }: SettingsFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [isPushSupported, setIsPushSupported] = useState(false);
+
+  useEffect(() => {
+    if ('Notification' in window) {
+      setIsPushSupported(true);
+    }
+  }, []);
 
   const form = useForm<SettingsFormValues>({
     resolver: zodResolver(settingsSchema),
     defaultValues: userSettings,
   });
+
+  const handlePushToggle = async (checked: boolean) => {
+    form.setValue('pushNotifications', checked);
+
+    if (checked && isPushSupported) {
+        if (Notification.permission === 'granted') {
+            // Permission already granted, we can proceed
+        } else if (Notification.permission !== 'denied') {
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                form.setValue('pushNotifications', false);
+                toast({
+                    title: "Permission Required",
+                    description: "You need to grant permission to receive push notifications.",
+                    variant: "destructive"
+                });
+            }
+        } else {
+            // Permission was explicitly denied.
+            form.setValue('pushNotifications', false);
+            toast({
+                title: "Permission Denied",
+                description: "To enable notifications, please update your browser settings.",
+                variant: "destructive"
+            });
+        }
+    }
+  };
 
   async function onSubmit(data: SettingsFormValues) {
     setLoading(true);
@@ -90,14 +125,14 @@ export function SettingsForm({ userSettings }: SettingsFormProps) {
               <div className="space-y-0.5">
                 <FormLabel className="text-base">Push Notifications</FormLabel>
                 <FormDescription>
-                  Get real-time alerts on this device. (Feature coming soon)
+                  Get real-time alerts on this device.
                 </FormDescription>
               </div>
               <FormControl>
                 <Switch
                   checked={field.value}
-                  onCheckedChange={field.onChange}
-                  disabled
+                  onCheckedChange={handlePushToggle}
+                  disabled={!isPushSupported}
                 />
               </FormControl>
             </FormItem>
