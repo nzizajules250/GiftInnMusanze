@@ -1,7 +1,7 @@
 // src/components/layout/NotificationBell.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Bell, MessageSquare, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -11,7 +11,7 @@ import type { Notification, SessionPayload } from "@/lib/types";
 import { markNotificationsAsReadAction } from "@/lib/actions";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { getIcon } from "@/lib/icons";
+import { useToast } from "@/hooks/use-toast";
 
 const parseDocWithDateConversion = (doc: any) => {
     const data = doc.data();
@@ -27,6 +27,8 @@ export function NotificationBell({ session }: { session: SessionPayload }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+  const { toast } = useToast();
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
     if (!session?.userId) return;
@@ -39,12 +41,32 @@ export function NotificationBell({ session }: { session: SessionPayload }) {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const newNotifications = snapshot.docs.map(doc => parseDocWithDateConversion(doc)) as Notification[];
-      setNotifications(newNotifications);
+      
+      setNotifications(prevNotifications => {
+          if (isInitialMount.current) {
+              isInitialMount.current = false;
+          } else {
+              const newlyAdded = newNotifications.filter(
+                  newNotif => !prevNotifications.some(oldNotif => oldNotif.id === newNotif.id)
+              );
+
+              newlyAdded.forEach(notification => {
+                  if (!notification.isRead) {
+                      toast({
+                          title: "New Notification",
+                          description: notification.message
+                      });
+                  }
+              });
+          }
+          return newNotifications;
+      });
+
       setUnreadCount(newNotifications.filter(n => !n.isRead).length);
     });
 
     return () => unsubscribe();
-  }, [session?.userId]);
+  }, [session?.userId, toast]);
 
   const handleOpenChange = async (open: boolean) => {
     setIsPopoverOpen(open);
