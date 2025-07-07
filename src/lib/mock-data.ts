@@ -113,3 +113,26 @@ export const attractions = [
     description: "The vibrant, neon-lit heart of the city."
   }
 ];
+
+export type Booking = {
+  id: string;
+  guestName: string;
+  roomName: string;
+  checkIn: Date;
+  checkOut: Date;
+  status: 'Confirmed' | 'Pending' | 'Cancelled';
+  total: number;
+};
+
+export const bookings: Booking[] = [
+  { id: 'BK001', guestName: 'John Doe', roomName: 'Executive King Suite', checkIn: new Date('2024-08-15'), checkOut: new Date('2024-08-18'), status: 'Confirmed', total: 750 },
+  { id: 'BK002', guestName: 'Jane Smith', roomName: 'Deluxe Queen Room', checkIn: new Date('2024-08-16'), checkOut: new Date('2024-08-20'), status: 'Confirmed', total: 600 },
+  { id: 'BK003', guestName: 'Peter Jones', roomName: 'Family Garden View Room', checkIn: new Date('2024-08-17'), checkOut: new Date('2024-08-19'), status: 'Pending', total: 440 },
+  { id: 'BK004', guestName: 'Emily White', roomName: 'Honeymoon Suite', checkIn: new Date('2024-09-01'), checkOut: new Date('2024-09-08'), status: 'Confirmed', total: 2450 },
+  { id: 'BK005', guestName: 'Michael Brown', roomName: 'Deluxe Queen Room', checkIn: new Date('2024-08-22'), checkOut: new Date('2024-08-25'), status: 'Cancelled', total: 450 },
+];
+
+export const userBookings: Booking[] = [
+    { id: 'BK001', guestName: 'Your Name', roomName: 'Executive King Suite', checkIn: new Date('2024-08-15'), checkOut: new Date('2024-08-18'), status: 'Confirmed', total: 750 },
+    { id: 'BK004', guestName: 'Your Name', roomName: 'Honeymoon Suite', checkIn: new Date('2024-09-01'), checkOut: new Date('2024-09-08'), status: 'Confirmed', total: 2450 },
+];

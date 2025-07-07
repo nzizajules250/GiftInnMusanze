@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/amenities", label: "Amenities" },
   { href: "/attractions", label: "Attractions" },
   { href: "/contact", label: "Contact" },
+  { href: "/dashboard", label: "Dashboard" },
 ];
 
 export default function Header() {
