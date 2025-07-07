@@ -55,8 +55,8 @@ export async function getSession(): Promise<SessionPayload | null> {
   const sessionSnapshot = await getDoc(sessionDocRef);
 
   if (!sessionSnapshot.exists()) {
-    // Clean up invalid cookie
-    cookies().delete('session');
+    // Session doesn't exist in DB, treat as logged out.
+    // The invalid cookie will be overwritten on next login.
     return null;
   }
 
@@ -64,9 +64,8 @@ export async function getSession(): Promise<SessionPayload | null> {
   const expires = (sessionData.expires as Timestamp).toDate();
 
   if (expires < new Date()) {
-    // Session has expired, delete it from Firestore and the cookie
+    // Session has expired, delete it from Firestore but don't touch cookies here.
     await deleteDoc(sessionDocRef);
-    cookies().delete('session');
     return null;
   }
 
