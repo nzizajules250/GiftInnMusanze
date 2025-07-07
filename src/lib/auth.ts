@@ -1,24 +1,30 @@
 import 'server-only';
-import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import type { SessionPayload } from './types';
 import { redirect } from 'next/navigation';
 import { db } from './firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, deleteDoc, Timestamp } from 'firebase/firestore';
+import { randomBytes } from 'crypto';
 
-const secretKey = process.env.JWT_SECRET_KEY;
+const aDayInSeconds = 24 * 60 * 60;
 
-// Throw an error during build or at server start if the key is missing.
-if (!secretKey) {
-  throw new Error('JWT_SECRET_KEY is not set in environment variables. Please add it to your .env file.');
+// This function will create a new session document in Firestore
+async function createSessionInFirestore(userId: string, role: 'admin' | 'guest', email: string) {
+    const sessionId = randomBytes(32).toString('hex');
+    const expires = new Date(Date.now() + aDayInSeconds * 1000);
+    
+    const sessionDocRef = doc(db, 'sessions', sessionId);
+    await setDoc(sessionDocRef, {
+        userId,
+        role,
+        email,
+        expires: Timestamp.fromDate(expires),
+    });
+
+    return { sessionId, expires };
 }
 
-const encodedKey = new TextEncoder().encode(secretKey);
-const aDay = 24 * 60 * 60 * 1000;
-
 export async function createSession(userId: string, role: 'admin' | 'guest') {
-  const expires = new Date(Date.now() + aDay);
-  
   let email = '';
   if (role === 'admin') {
       const adminDocRef = doc(db, 'admins', userId);
@@ -27,41 +33,61 @@ export async function createSession(userId: string, role: 'admin' | 'guest') {
           email = adminSnapshot.data().email;
       }
   }
-  
-  const session: SessionPayload = { userId, role, expires, email };
 
-  const jwt = await new SignJWT(session)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('1d')
-    .sign(encodedKey);
+  const { sessionId, expires } = await createSessionInFirestore(userId, role, email);
   
-  cookies().set('session', jwt, {
+  cookies().set('session', sessionId, {
     expires,
     httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
     path: '/',
+    sameSite: 'lax',
   });
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
-  const sessionCookie = cookies().get('session')?.value;
-  if (!sessionCookie) {
+  const sessionId = cookies().get('session')?.value;
+  if (!sessionId) {
     return null;
   }
 
-  try {
-    const { payload } = await jwtVerify(sessionCookie, encodedKey, {
-      algorithms: ['HS256'],
-    });
-    return payload as SessionPayload;
-  } catch (error) {
-    // This will effectively log out the user with an invalid token.
-    console.error('Failed to verify session:', error);
+  const sessionDocRef = doc(db, 'sessions', sessionId);
+  const sessionSnapshot = await getDoc(sessionDocRef);
+
+  if (!sessionSnapshot.exists()) {
+    // Clean up invalid cookie
+    cookies().delete('session');
     return null;
   }
+
+  const sessionData = sessionSnapshot.data();
+  const expires = (sessionData.expires as Timestamp).toDate();
+
+  if (expires < new Date()) {
+    // Session has expired, delete it from Firestore and the cookie
+    await deleteDoc(sessionDocRef);
+    cookies().delete('session');
+    return null;
+  }
+
+  return {
+    userId: sessionData.userId,
+    role: sessionData.role,
+    email: sessionData.email,
+    expires: expires,
+  };
 }
 
-export function deleteSession() {
+export async function deleteSession() {
+  const sessionId = cookies().get('session')?.value;
+  if (sessionId) {
+      try {
+        const sessionDocRef = doc(db, 'sessions', sessionId);
+        await deleteDoc(sessionDocRef);
+      } catch (error) {
+          console.error("Failed to delete session from Firestore:", error);
+      }
+  }
   cookies().delete('session');
   redirect('/login');
 }
