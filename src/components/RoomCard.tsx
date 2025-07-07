@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { Room } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 interface RoomCardProps {
   room: Room;
@@ -26,7 +27,9 @@ export function RoomCard({ room }: RoomCardProps) {
       <CardContent className="flex-grow"></CardContent>
       <CardFooter className="flex justify-between items-center">
         <p className="text-xl font-bold">${room.price}<span className="text-sm font-normal text-muted-foreground">/night</span></p>
-        <Button variant="outline">View Details</Button>
+        <Button asChild variant="outline">
+          <Link href={`/rooms/${room.id}`}>View Details</Link>
+        </Button>
       </CardFooter>
     </Card>
   );

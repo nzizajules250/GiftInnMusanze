@@ -38,6 +38,15 @@ export async function getRooms(): Promise<Room[]> {
   return roomsList as Room[];
 }
 
+export async function getRoomById(id: string): Promise<Room | null> {
+    const roomDocRef = doc(db, 'rooms', id);
+    const roomSnapshot = await getDoc(roomDocRef);
+    if (!roomSnapshot.exists()) {
+        return null;
+    }
+    return parseDocWithDateConversion(roomSnapshot) as Room;
+}
+
 export async function getAmenities(): Promise<Amenity[]> {
     const amenitiesCollection = collection(db, 'amenities');
     const amenitiesSnapshot = await getDocs(amenitiesCollection);
@@ -129,7 +138,7 @@ export async function getUserProfile(session: SessionPayload) {
 }
 
 
-// --- Auth Functions ---
+// --- Auth & Booking Functions ---
 
 export async function findBookingForLogin(guestName: string, guestIdNumber: string, roomName: string): Promise<Booking | null> {
     const q = query(collection(db, 'bookings'), 
@@ -157,5 +166,13 @@ export async function findAdminByEmail(email: string): Promise<Admin | null> {
 export async function createAdminUserInFirestore(email: string, passwordHash: string): Promise<string> {
     const adminsCollection = collection(db, 'admins');
     const docRef = await addDoc(adminsCollection, { email, passwordHash });
+    return docRef.id;
+}
+
+type NewBookingData = Omit<Booking, 'id'>;
+
+export async function createBooking(bookingData: NewBookingData): Promise<string> {
+    const bookingsCollection = collection(db, 'bookings');
+    const docRef = await addDoc(bookingsCollection, bookingData);
     return docRef.id;
 }

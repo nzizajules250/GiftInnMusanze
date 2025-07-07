@@ -9,10 +9,12 @@ import {
   findBookingForLogin,
   findAdminByEmail,
   createAdminUserInFirestore,
+  createBooking,
 } from './firebase-service';
 import { createSession, deleteSession } from './auth';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
+import { differenceInDays } from 'date-fns';
 
 export async function getRecommendationsAction(
   input: PersonalizedRecommendationsInput
@@ -155,4 +157,45 @@ export async function adminRegisterAction(
 
 export async function logoutAction() {
   deleteSession();
+}
+
+
+const createBookingSchema = z.object({
+    guestName: z.string().min(2, { message: "Name must be at least 2 characters." }),
+    guestIdNumber: z.string().min(4, { message: "ID number seems too short." }),
+    phoneNumber: z.string().min(10, { message: "Please enter a valid phone number." }),
+    checkIn: z.coerce.date(),
+    checkOut: z.coerce.date(),
+    roomName: z.string(),
+    total: z.number(),
+}).refine(data => data.checkOut > data.checkIn, {
+    message: "Check-out date must be after check-in date.",
+    path: ["checkOut"],
+});
+
+
+export async function createBookingAction(values: z.infer<typeof createBookingSchema>) {
+    let success = false;
+    try {
+        const validatedData = createBookingSchema.safeParse(values);
+        if (!validatedData.success) {
+            return { success: false, error: validatedData.error.errors[0].message };
+        }
+        
+        const bookingData = {
+            ...validatedData.data,
+            status: 'Pending' as const,
+        }
+
+        await createBooking(bookingData);
+        success = true;
+
+    } catch(e: any) {
+        console.error('Booking creation error:', e);
+        return { success: false, error: e.message || 'An unexpected error occurred.' };
+    }
+
+    if (success) {
+        redirect('/login?booking=success');
+    }
 }
