@@ -19,9 +19,10 @@ import {
   markMessageAsRead,
   findAdmins,
   createNotification,
-  markNotificationsAsRead
+  markNotificationsAsRead,
+  getBookingById
 } from './firebase-service';
-import { createSession, deleteSession } from './auth';
+import { createSession, deleteSession, getSession } from './auth';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
@@ -310,7 +311,36 @@ export async function deleteAmenityAction(amenityId: string) {
 
 export async function updateBookingStatusAction(bookingId: string, status: Booking['status']) {
     try {
+        const session = await getSession();
+        if (!session || session.role !== 'admin') {
+            throw new Error('Unauthorized action.');
+        }
+
+        const adminId = session.userId;
+        
         await updateBookingStatus(bookingId, status);
+
+        const booking = await getBookingById(bookingId);
+        if (!booking) {
+            throw new Error('Booking not found.');
+        }
+
+        // Create notification for the guest
+        await createNotification({
+            userId: booking.id, // For guests, their session userId is their bookingId
+            message: `Your booking for ${booking.roomName} has been ${status.toLowerCase()}.`,
+            href: '/dashboard',
+            isRead: false,
+        });
+
+        // Create a confirmation notification for the admin who made the change
+        await createNotification({
+            userId: adminId,
+            message: `You ${status.toLowerCase()} the booking for ${booking.guestName}.`,
+            href: `/dashboard/admin?tab=bookings`,
+            isRead: false,
+        });
+
         revalidatePath('/dashboard/admin');
         return { success: true };
     } catch (e: any) {

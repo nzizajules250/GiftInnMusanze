@@ -42,6 +42,15 @@ export async function getRoomById(id: string): Promise<Room | null> {
     return transformRoomData(roomSnapshot) as Room;
 }
 
+export async function getBookingById(id: string): Promise<Booking | null> {
+    const bookingDocRef = doc(db, 'bookings', id);
+    const bookingSnapshot = await getDoc(bookingDocRef);
+    if (!bookingSnapshot.exists()) {
+        return null;
+    }
+    return parseDocWithDateConversion(bookingSnapshot) as Booking;
+}
+
 export async function getAmenities(): Promise<Amenity[]> {
     const amenitiesCollection = collection(db, 'amenities');
     const amenitiesSnapshot = await getDocs(amenitiesCollection);
