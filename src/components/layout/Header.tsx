@@ -5,6 +5,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { getSession } from "@/lib/auth";
 import { logoutAction } from "@/lib/actions";
 import { NotificationBell } from "./NotificationBell";
+import { ModeToggle } from "./ModeToggle";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -46,6 +47,7 @@ export default async function Header() {
         </nav>
 
         <div className="flex flex-1 items-center justify-end space-x-2">
+            <ModeToggle />
             {session && <NotificationBell session={session} />}
             {session ? (
                  <form action={logoutAction}>
