@@ -3,6 +3,8 @@ import { getAttractions } from "@/lib/firebase-service";
 import { AttractionsMap } from "@/components/AttractionsMap";
 import { getIcon } from "@/lib/icons";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AttractionsPage() {
   const attractions = await getAttractions();
 

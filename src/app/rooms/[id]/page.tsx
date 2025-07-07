@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 
+export const dynamic = 'force-dynamic';
+
 export default async function RoomDetailPage({ params }: { params: { id: string } }) {
     const [room, bookings] = await Promise.all([
         getRoomById(params.id),

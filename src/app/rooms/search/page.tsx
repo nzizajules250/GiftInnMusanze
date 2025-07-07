@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { BookingForm } from "@/components/BookingForm";
 
+export const dynamic = 'force-dynamic';
+
 export default async function SearchResultsPage({
   searchParams,
 }: {

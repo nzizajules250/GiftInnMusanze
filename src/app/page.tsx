@@ -12,6 +12,8 @@ import { RoomCard } from "@/components/RoomCard";
 import { AmenityCard } from "@/components/AmenityCard";
 import { AnimatedTitle } from "@/components/AnimatedTitle";
 
+export const dynamic = 'force-dynamic';
+
 const heroImages = [
   { src: "https://placehold.co/1600x800.png", alt: "Modern hotel lobby with elegant seating", hint: "hotel lobby" },
   { src: "https://placehold.co/1600x800.png", alt: "Luxurious hotel suite with a city view", hint: "hotel suite" },
