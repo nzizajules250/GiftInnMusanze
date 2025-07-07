@@ -45,13 +45,21 @@ export type Admin = {
     id: string;
     email: string;
     passwordHash: string;
+    name: string;
 }
 
 export type SessionPayload = {
     userId: string;
     role: 'admin' | 'guest';
+    email: string;
     expires: Date;
 };
+
+export type UserProfile = {
+    name: string;
+    email: string;
+    avatar: string;
+}
 
 export type ContactMessage = {
     id: string;

@@ -19,9 +19,18 @@ interface DeleteConfirmationDialogProps {
   setIsOpen: (open: boolean) => void;
   onConfirm: () => Promise<any>;
   itemType: string;
+  title?: string;
+  description?: string;
 }
 
-export function DeleteConfirmationDialog({ isOpen, setIsOpen, onConfirm, itemType }: DeleteConfirmationDialogProps) {
+export function DeleteConfirmationDialog({ 
+    isOpen, 
+    setIsOpen, 
+    onConfirm, 
+    itemType, 
+    title, 
+    description 
+}: DeleteConfirmationDialogProps) {
   const [loading, setLoading] = useState(false);
 
   const handleConfirm = async () => {
@@ -34,10 +43,9 @@ export function DeleteConfirmationDialog({ isOpen, setIsOpen, onConfirm, itemTyp
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>{title || `Are you absolutely sure?`}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the {itemType}
-            and remove its data from our servers.
+            {description || `This action cannot be undone. This will permanently delete the ${itemType} and remove its data from our servers.`}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

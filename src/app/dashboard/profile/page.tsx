@@ -1,11 +1,10 @@
 import { getSession } from "@/lib/auth";
 import { getUserProfile } from "@/lib/firebase-service";
 import { redirect } from "next/navigation";
-import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { ProfileForm } from "@/components/dashboard/ProfileForm";
 
 export default async function ProfilePage() {
     const session = await getSession();
@@ -31,37 +30,8 @@ export default async function ProfilePage() {
                     </div>
                 </CardHeader>
                 <CardContent>
-                    <form className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="name">Full Name</Label>
-                                <Input id="name" defaultValue={user.name} />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="email">Email</Label>
-                                <Input id="email" defaultValue={user.email} disabled />
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="current-password">Current Password</Label>
-                            <Input id="current-password" type="password" placeholder="Enter current password to change" />
-                        </div>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="new-password">New Password</Label>
-                                <Input id="new-password" type="password" />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="confirm-password">Confirm New Password</Label>
-                                <Input id="confirm-password" type="password" />
-                            </div>
-                        </div>
-                        
-                    </form>
+                    <ProfileForm user={user} session={session} />
                 </CardContent>
-                <CardFooter className="border-t pt-6">
-                     <Button>Update Profile</Button>
-                </CardFooter>
             </Card>
         </div>
     );

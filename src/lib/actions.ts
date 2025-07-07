@@ -20,7 +20,8 @@ import {
   findAdmins,
   createNotification,
   markNotificationsAsRead,
-  getBookingById
+  getBookingById,
+  updateUserProfile,
 } from './firebase-service';
 import { createSession, deleteSession, getSession } from './auth';
 import bcrypt from 'bcryptjs';
@@ -372,6 +373,91 @@ export async function markNotificationsAsReadAction(userId: string) {
     }
 }
 
+const profileFormSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters."),
+  currentPassword: z.string().optional(),
+  newPassword: z.string().optional(),
+}).refine(data => {
+    if (data.newPassword && !data.currentPassword) return false;
+    return true;
+}, { message: "Current password is required to set a new password.", path: ["currentPassword"] })
+  .refine(data => {
+    if (data.newPassword && data.newPassword.length < 8) return false;
+    return true;
+}, { message: "New password must be at least 8 characters.", path: ["newPassword"] });
+
+
+export async function updateUserProfileAction(values: z.infer<typeof profileFormSchema>) {
+    try {
+        const session = await getSession();
+        if (!session) return { success: false, error: 'Unauthorized.' };
+        
+        const validatedData = profileFormSchema.safeParse(values);
+        if (!validatedData.success) {
+            return { success: false, error: validatedData.error.errors[0].message };
+        }
+
+        const { name, currentPassword, newPassword } = validatedData.data;
+        const updatePayload: { name?: string; passwordHash?: string } = { name };
+
+        if (session.role === 'admin' && newPassword && currentPassword) {
+            const admin = await findAdminByEmail(session.email);
+
+            if(!admin) return { success: false, error: "Admin not found." };
+            
+            const isPasswordMatch = await bcrypt.compare(currentPassword, admin.passwordHash);
+            if (!isPasswordMatch) {
+                return { success: false, error: "Incorrect current password." };
+            }
+            updatePayload.passwordHash = await bcrypt.hash(newPassword, 10);
+        }
+
+        await updateUserProfile(session, updatePayload);
+
+        revalidatePath('/dashboard/profile');
+        revalidatePath('/dashboard');
+        return { success: true };
+
+    } catch (e: any) {
+        console.error('Update profile error:', e);
+        return { success: false, error: e.message };
+    }
+}
+
+export async function cancelUserBookingAction(bookingId: string) {
+    try {
+        const session = await getSession();
+        if (!session || session.role !== 'guest' || session.userId !== bookingId) {
+            return { success: false, error: 'Unauthorized action.' };
+        }
+
+        await updateBookingStatus(bookingId, 'Cancelled');
+
+        const booking = await getBookingById(bookingId);
+        if (!booking) {
+            return { success: false, error: 'Booking not found.' };
+        }
+
+        const admins = await findAdmins();
+        for (const admin of admins) {
+            await createNotification({
+                userId: admin.id,
+                message: `Guest ${booking.guestName} cancelled their booking for ${booking.roomName}.`,
+                href: `/dashboard/admin?tab=bookings`,
+                isRead: false,
+            });
+        }
+        
+        revalidatePath('/dashboard');
+        return { success: true };
+
+    } catch (e: any) {
+        console.error('Cancel booking error:', e);
+        return { success: false, error: e.message };
+    }
+}
+
+
 const userSettingsSchema = z.object({
   emailNotifications: z.boolean(),
   pushNotifications: z.boolean(),
@@ -380,7 +466,7 @@ const userSettingsSchema = z.object({
 export async function updateUserSettingsAction(values: z.infer<typeof userSettingsSchema>) {
     console.log("Updating user settings (simulated):", values);
     // In a real app, you would save these settings to the user's profile in Firebase.
-    // For now, we'll just simulate a successful save.
+    // For now, we'll simulate a successful save.
     
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500));

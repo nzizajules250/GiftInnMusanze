@@ -1,6 +1,6 @@
 import { db } from './firebase';
 import { collection, getDocs, query, where, addDoc, doc, getDoc, updateDoc, deleteDoc, setDoc, Timestamp, writeBatch, orderBy, limit } from 'firebase/firestore';
-import type { Room, Booking, Amenity, Attraction, Admin, SessionPayload, ContactMessage, Notification } from './types';
+import type { Room, Booking, Amenity, Attraction, Admin, SessionPayload, ContactMessage, Notification, UserProfile } from './types';
 import { getIcon } from './icons';
 
 const parseDocWithDateConversion = (doc: any) => {
@@ -94,14 +94,14 @@ export async function getUserBookings(session: SessionPayload | null): Promise<B
 }
 
 
-export async function getUserProfile(session: SessionPayload) {
+export async function getUserProfile(session: SessionPayload): Promise<UserProfile> {
     if (session.role === 'admin') {
         const adminDocRef = doc(db, 'admins', session.userId);
         const adminSnapshot = await getDoc(adminDocRef);
         if (adminSnapshot.exists()) {
             const adminData = adminSnapshot.data() as Admin;
             return {
-                name: "Administrator",
+                name: adminData.name || "Administrator",
                 email: adminData.email,
                 avatar: "https://placehold.co/100x100.png"
             }
@@ -115,7 +115,7 @@ export async function getUserProfile(session: SessionPayload) {
             const bookingData = bookingSnapshot.data() as Booking;
             return {
                 name: bookingData.guestName,
-                email: "Guest Account",
+                email: "Guest Account (no email)",
                 avatar: "https://placehold.co/100x100.png"
             }
         }
@@ -164,9 +164,29 @@ export async function findAdmins(): Promise<Admin[]> {
 
 export async function createAdminUserInFirestore(email: string, passwordHash: string): Promise<string> {
     const adminsCollection = collection(db, 'admins');
-    const docRef = await addDoc(adminsCollection, { email, passwordHash });
+    const docRef = await addDoc(adminsCollection, { 
+        email, 
+        passwordHash, 
+        name: 'Administrator' 
+    });
     return docRef.id;
 }
+
+export async function updateUserProfile(session: SessionPayload, data: { name?: string; passwordHash?: string }) {
+    if (session.role === 'admin') {
+        if (!data.name && !data.passwordHash) return;
+        const adminDocRef = doc(db, 'admins', session.userId);
+        const updateData: { name?: string, passwordHash?: string } = {};
+        if (data.name) updateData.name = data.name;
+        if (data.passwordHash) updateData.passwordHash = data.passwordHash;
+        await updateDoc(adminDocRef, updateData);
+    } else if (session.role === 'guest') {
+        if (!data.name) return;
+        const bookingDocRef = doc(db, 'bookings', session.userId);
+        await updateDoc(bookingDocRef, { guestName: data.name });
+    }
+}
+
 
 type NewBookingData = Omit<Booking, 'id'>;
 

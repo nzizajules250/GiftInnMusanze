@@ -3,6 +3,7 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import type { SessionPayload } from './types';
 import { redirect } from 'next/navigation';
+import { findAdminByEmail } from './firebase-service';
 
 const secretKey = process.env.JWT_SECRET_KEY;
 
@@ -16,7 +17,14 @@ const aDay = 24 * 60 * 60 * 1000;
 
 export async function createSession(userId: string, role: 'admin' | 'guest') {
   const expires = new Date(Date.now() + aDay);
-  const session: SessionPayload = { userId, role, expires };
+  
+  let email = '';
+  if (role === 'admin') {
+      const admin = await findAdminByEmail(userId);
+      if (admin) email = admin.email;
+  }
+  
+  const session: SessionPayload = { userId, role, expires, email };
 
   const jwt = await new SignJWT(session)
     .setProtectedHeader({ alg: 'HS256' })
