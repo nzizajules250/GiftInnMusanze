@@ -1,11 +1,9 @@
-"use client";
-
 import Link from "next/link";
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
+import { getSession } from "@/lib/auth";
+import { logoutAction } from "@/lib/actions";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -13,11 +11,10 @@ const navLinks = [
   { href: "/amenities", label: "Amenities" },
   { href: "/attractions", label: "Attractions" },
   { href: "/contact", label: "Contact" },
-  { href: "/dashboard", label: "Dashboard" },
 ];
 
-export default function Header() {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+export default async function Header() {
+  const session = await getSession();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -40,14 +37,30 @@ export default function Header() {
               {label}
             </Link>
           ))}
+          {session && (
+             <Link href="/dashboard" className="transition-colors hover:text-foreground/80 text-foreground/60">
+                Dashboard
+             </Link>
+          )}
         </nav>
 
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <Button className="hidden md:inline-flex bg-accent hover:bg-accent/90 text-accent-foreground">
-            Book Now
-          </Button>
-
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            {session ? (
+                 <form action={logoutAction}>
+                    <Button type="submit" variant="outline">Logout</Button>
+                </form>
+            ) : (
+                <>
+                 <Button asChild variant="outline" className="hidden md:inline-flex">
+                    <Link href="/login">Login</Link>
+                 </Button>
+                 <Button asChild className="hidden md:inline-flex bg-accent hover:bg-accent/90 text-accent-foreground">
+                    <Link href="/register">Admin Register</Link>
+                 </Button>
+                </>
+            )}
+         
+          <Sheet>
             <SheetTrigger asChild>
               <Button
                 variant="ghost"
@@ -62,21 +75,31 @@ export default function Header() {
                 <span className="font-bold font-headline text-2xl">SereneStay</span>
               </Link>
               <div className="flex flex-col space-y-4">
-                {navLinks.map(({ href, label }) => (
+                {[...navLinks, ...(session ? [{href: "/dashboard", label: "Dashboard"}] : [])].map(({ href, label }) => (
                   <Link
                     key={href}
                     href={href}
-                    onClick={() => setIsMobileMenuOpen(false)}
                     className="text-lg font-medium px-6 py-2 hover:bg-primary rounded-l-full"
                   >
                     {label}
                   </Link>
                 ))}
               </div>
-              <div className="mt-8 px-6">
-                <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-                    Book Now
-                </Button>
+              <div className="mt-8 px-6 flex flex-col space-y-2">
+                 {session ? (
+                     <form action={logoutAction}>
+                        <Button type="submit" className="w-full">Logout</Button>
+                    </form>
+                 ) : (
+                    <>
+                        <Button asChild className="w-full">
+                           <Link href="/login">Login</Link>
+                        </Button>
+                        <Button asChild variant="outline" className="w-full">
+                           <Link href="/register">Admin Register</Link>
+                        </Button>
+                    </>
+                 )}
               </div>
             </SheetContent>
           </Sheet>

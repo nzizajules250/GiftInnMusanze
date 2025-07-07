@@ -5,14 +5,24 @@ import { format } from "date-fns";
 import Image from "next/image";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function UserDashboardPage() {
+    const session = await getSession();
+    if (!session) {
+        redirect('/login');
+    }
+
+    // In a real app, you'd fetch user details based on session.userId
     const user = {
-        name: "Alex Doe",
+        name: "Alex Doe", 
         email: "alex.doe@example.com",
         avatar: "https://placehold.co/100x100.png"
     }
-    const [userBookings, rooms] = await Promise.all([getUserBookings(), getRooms()]);
+
+    // Fetch bookings associated with the logged-in user's ID
+    const [userBookings, rooms] = await Promise.all([getUserBookings(session.userId), getRooms()]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -52,7 +62,12 @@ export default async function UserDashboardPage() {
                              )
                         })}
                          {userBookings.filter(b => b.status === 'Confirmed').length === 0 && (
-                            <p className="text-muted-foreground text-center py-8">You have no upcoming stays.</p>
+                            <div className="text-center py-8">
+                                <p className="text-muted-foreground">You have no upcoming stays.</p>
+                                <Button asChild className="mt-4">
+                                    <Link href="/rooms">Book a Room</Link>
+                                </Button>
+                            </div>
                         )}
                     </CardContent>
                 </Card>

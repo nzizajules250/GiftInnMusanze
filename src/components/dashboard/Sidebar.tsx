@@ -4,16 +4,24 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, User, Shield, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
+import type { SessionPayload } from "@/lib/types";
 
-const sidebarNavLinks = [
-  { href: "/dashboard", label: "My Dashboard", icon: Home },
-  { href: "/dashboard/admin", label: "Admin", icon: Shield },
-  { href: "/dashboard/profile", label: "Profile", icon: User },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+const baseNavLinks = [
+  { href: "/dashboard", label: "My Dashboard", icon: Home, roles: ['guest', 'admin'] },
+  { href: "/dashboard/profile", label: "Profile", icon: User, roles: ['guest', 'admin'] },
+  { href: "/dashboard/settings", label: "Settings", icon: Settings, roles: ['guest', 'admin'] },
 ];
 
-export function Sidebar() {
+const adminNavLink = { href: "/dashboard/admin", label: "Admin", icon: Shield, roles: ['admin'] };
+
+
+export function Sidebar({ session }: { session: SessionPayload | null }) {
   const pathname = usePathname();
+
+  const sidebarNavLinks = [
+      ...baseNavLinks,
+      ...(session?.role === 'admin' ? [adminNavLink] : [])
+  ];
 
   return (
     <div className="hidden md:block w-64 bg-card border-r p-4">

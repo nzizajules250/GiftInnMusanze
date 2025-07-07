@@ -28,9 +28,22 @@ export type Attraction = {
 export type Booking = {
   id: string;
   guestName: string;
+  guestIdNumber: string;
   roomName: string;
   checkIn: Date;
   checkOut: Date;
   status: 'Confirmed' | 'Pending' | 'Cancelled';
   total: number;
+};
+
+export type Admin = {
+    id: string;
+    email: string;
+    passwordHash: string;
+}
+
+export type SessionPayload = {
+    userId: string;
+    role: 'admin' | 'guest';
+    expires: Date;
 };

@@ -1,8 +1,8 @@
 'use server';
 
 import { db } from './firebase';
-import { collection, getDocs } from 'firebase/firestore';
-import type { Room, Booking, Amenity, Attraction } from './types';
+import { collection, getDocs, query, where, addDoc } from 'firebase/firestore';
+import type { Room, Booking, Amenity, Attraction, Admin } from './types';
 import { Wifi, Dumbbell, Waves, Utensils, Sparkles, Building, Trees, ShoppingBag, MapPin } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 
@@ -71,15 +71,45 @@ export async function getBookings(): Promise<Booking[]> {
     return bookingsList as Booking[];
 }
 
-// In a real app, you would filter by an authenticated user's ID.
-// For this demo, we'll simulate fetching bookings for a specific user.
-export async function getUserBookings(): Promise<Booking[]> {
-    const allBookings = await getBookings();
-    // Assuming a hardcoded user for demo purposes
-    const userBookings = allBookings.filter(b => b.guestName === "Alex Doe");
-    if (userBookings.length > 0) {
-        return userBookings;
+export async function getUserBookings(userId: string): Promise<Booking[]> {
+    const q = query(collection(db, 'bookings'), where('id', '==', userId));
+    const bookingsSnapshot = await getDocs(q);
+    if (!bookingsSnapshot.empty) {
+        return bookingsSnapshot.docs.map(doc => parseDocWithDateConversion(doc)) as Booking[];
     }
-    // Fallback to show some data if the user has no bookings
+    
+    // Fallback if the user has no specific bookings (or for initial demo)
+    const allBookings = await getBookings();
     return allBookings.filter(b => b.status === 'Confirmed').slice(0, 2);
+}
+
+// --- Auth Functions ---
+
+export async function findBookingForLogin(guestName: string, guestIdNumber: string, roomName: string): Promise<Booking | null> {
+    const q = query(collection(db, 'bookings'), 
+        where('guestName', '==', guestName),
+        where('guestIdNumber', '==', guestIdNumber),
+        where('roomName', '==', roomName)
+    );
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+        return null;
+    }
+    // Assuming the combination is unique, return the first match
+    return parseDocWithDateConversion(snapshot.docs[0]) as Booking;
+}
+
+export async function findAdminByEmail(email: string): Promise<Admin | null> {
+    const q = query(collection(db, 'admins'), where('email', '==', email));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) {
+        return null;
+    }
+    return parseDocWithDateConversion(snapshot.docs[0]) as Admin;
+}
+
+export async function createAdminUserInFirestore(email: string, passwordHash: string): Promise<string> {
+    const adminsCollection = collection(db, 'admins');
+    const docRef = await addDoc(adminsCollection, { email, passwordHash });
+    return docRef.id;
 }
