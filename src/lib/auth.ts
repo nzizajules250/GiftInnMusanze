@@ -3,7 +3,8 @@ import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import type { SessionPayload } from './types';
 import { redirect } from 'next/navigation';
-import { findAdminByEmail } from './firebase-service';
+import { db } from './firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 const secretKey = process.env.JWT_SECRET_KEY;
 
@@ -20,8 +21,11 @@ export async function createSession(userId: string, role: 'admin' | 'guest') {
   
   let email = '';
   if (role === 'admin') {
-      const admin = await findAdminByEmail(userId);
-      if (admin) email = admin.email;
+      const adminDocRef = doc(db, 'admins', userId);
+      const adminSnapshot = await getDoc(adminDocRef);
+      if (adminSnapshot.exists()) {
+          email = adminSnapshot.data().email;
+      }
   }
   
   const session: SessionPayload = { userId, role, expires, email };
