@@ -2,6 +2,8 @@ import { AmenityCard } from "@/components/AmenityCard";
 import { getAmenities } from "@/lib/firebase-service";
 import Image from "next/image";
 
+export const dynamic = 'force-dynamic';
+
 export default async function AmenitiesPage() {
   const amenities = await getAmenities();
 
