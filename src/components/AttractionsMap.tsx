@@ -11,7 +11,7 @@ export function AttractionsMap() {
         className="object-cover"
       />
       <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
-        <div className="bg-white/80 p-4 rounded-md text-center">
+        <div className="bg-white/80 dark:bg-black/80 p-4 rounded-md text-center shadow-lg">
             <h3 className="font-bold">Map is for illustrative purposes.</h3>
             <p className="text-sm">Interactive map coming soon.</p>
         </div>

@@ -81,10 +81,10 @@ export default async function RoomDetailPage({ params }: { params: { id: string 
 
                     <div className="mt-8">
                         <div className="flex flex-wrap items-center gap-4">
-                            <h1 className="text-4xl font-headline">{room.name}</h1>
+                            <h1 className="text-4xl font-headline text-primary">{room.name}</h1>
                             {isOccupiedToday && <Badge variant="destructive">Occupied Today</Badge>}
                         </div>
-                        <p className="text-2xl font-bold mt-2">${room.price}<span className="text-lg font-normal text-muted-foreground">/night</span></p>
+                        <p className="text-2xl font-bold mt-2 text-primary">${room.price}<span className="text-lg font-normal text-muted-foreground">/night</span></p>
                         <p className="text-muted-foreground mt-4 text-lg">{room.description}</p>
                     </div>
                 </div>

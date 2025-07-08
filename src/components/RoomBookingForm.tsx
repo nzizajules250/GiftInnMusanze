@@ -89,12 +89,12 @@ export function RoomBookingForm({ room, isOccupied }: { room: Room, isOccupied?:
     
     if (isOccupied) {
         return (
-            <Card className="shadow-lg">
+            <Card className="shadow-lg sticky top-24">
                 <CardHeader>
                     <CardTitle className="font-headline text-2xl">Reserve Your Stay</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <Alert>
+                    <Alert variant="destructive">
                         <Info className="h-4 w-4" />
                         <AlertTitle>Currently Occupied</AlertTitle>
                         <AlertDescription>
@@ -108,7 +108,7 @@ export function RoomBookingForm({ room, isOccupied }: { room: Room, isOccupied?:
 
 
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg sticky top-24">
         <CardHeader>
             <CardTitle className="font-headline text-2xl">Reserve Your Stay</CardTitle>
             <CardDescription>Fill out the form below to book this room.</CardDescription>
@@ -162,12 +162,12 @@ export function RoomBookingForm({ room, isOccupied }: { room: Room, isOccupied?:
                     )}/>
                  </div>
                 {total > 0 && (
-                    <div className="p-4 bg-primary/10 rounded-lg text-center">
+                    <div className="p-4 bg-secondary rounded-lg text-center">
                         <p className="text-sm text-muted-foreground">Estimated Total</p>
-                        <p className="text-2xl font-bold text-primary-foreground">${total.toFixed(2)}</p>
+                        <p className="text-2xl font-bold text-primary">${total.toFixed(2)}</p>
                     </div>
                 )}
-                <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={loading}>
+                <Button type="submit" className="w-full" disabled={loading}>
                     {loading && <Loader2 className="animate-spin mr-2" />}
                     Book Now
                 </Button>

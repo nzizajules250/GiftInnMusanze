@@ -26,7 +26,7 @@ export default async function Header() {
       <div className="container flex h-16 items-center">
         <div className="mr-4 flex">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold sm:inline-block font-headline text-2xl">
+            <span className="font-bold sm:inline-block font-headline text-2xl text-primary">
               Gift Inn
             </span>
           </Link>
@@ -52,7 +52,7 @@ export default async function Header() {
         <div className="flex flex-1 items-center justify-end space-x-2 md:space-x-4">
             <Popover>
               <PopoverTrigger asChild>
-                <Button>
+                <Button variant="secondary">
                   <BedDouble className="mr-2 h-4 w-4" />
                   Book a Room
                 </Button>
@@ -67,14 +67,14 @@ export default async function Header() {
             {session && <NotificationBell session={session} />}
             {session ? (
                  <form action={logoutAction}>
-                    <Button type="submit" variant="outline">Logout</Button>
+                    <Button type="submit" variant="ghost">Logout</Button>
                 </form>
             ) : (
                 <>
-                 <Button asChild variant="outline" className="hidden md:inline-flex">
+                 <Button asChild variant="ghost" className="hidden md:inline-flex">
                     <Link href="/login">Login</Link>
                  </Button>
-                 <Button asChild className="hidden md:inline-flex bg-accent hover:bg-accent/90 text-accent-foreground">
+                 <Button asChild className="hidden md:inline-flex">
                     <Link href="/register">Admin Register</Link>
                  </Button>
                 </>
@@ -93,14 +93,14 @@ export default async function Header() {
             <SheetContent side="left" className="pr-0 pt-12">
               <SheetTitle className="sr-only">Menu</SheetTitle>
               <Link href="/" className="flex items-center mb-8 px-6">
-                <span className="font-bold font-headline text-2xl">Gift Inn</span>
+                <span className="font-bold font-headline text-2xl text-primary">Gift Inn</span>
               </Link>
               <div className="flex flex-col space-y-3">
                 {[...navLinks, ...(session ? [{href: "/dashboard", label: "Dashboard"}] : [])].map(({ href, label }) => (
                   <Link
                     key={href}
                     href={href}
-                    className="text-lg font-medium px-6 py-2 hover:bg-primary/80 rounded-l-full transition-colors"
+                    className="text-lg font-medium px-6 py-2 hover:bg-secondary rounded-l-full transition-colors"
                   >
                     {label}
                   </Link>

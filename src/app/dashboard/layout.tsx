@@ -11,7 +11,7 @@ export default async function DashboardLayout({
   return (
     <div className="flex min-h-[calc(100vh-4rem)]">
       <Sidebar session={session} />
-      <main className="flex-1 p-8 bg-muted/40">
+      <main className="flex-1 p-8 bg-secondary/50">
         {children}
       </main>
     </div>

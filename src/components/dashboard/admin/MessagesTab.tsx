@@ -38,7 +38,7 @@ export function MessagesTab({ messages: initialMessages }: { messages: ContactMe
                             <AccordionTrigger className="w-full text-left hover:no-underline">
                                <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center justify-between w-full pr-4">
                                     <div className="flex items-center gap-2 truncate">
-                                        {!message.isRead && <Badge>New</Badge>}
+                                        {!message.isRead && <Badge variant="destructive">New</Badge>}
                                         <span className="font-semibold truncate">{message.name}</span>
                                         <span className="text-muted-foreground hidden md:inline truncate">{message.email}</span>
                                     </div>

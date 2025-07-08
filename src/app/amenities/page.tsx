@@ -9,7 +9,7 @@ export default async function AmenitiesPage() {
 
   return (
     <>
-      <section className="relative h-[40vh] bg-primary/20 flex items-center justify-center">
+      <section className="relative h-[40vh] flex items-center justify-center">
          <Image
             src="https://placehold.co/1920x400.png"
             alt="Relaxing spa setting"
@@ -17,10 +17,10 @@ export default async function AmenitiesPage() {
             fill
             className="object-cover"
           />
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="relative text-center text-white z-10 p-4">
+        <div className="absolute inset-0 bg-primary/40" />
+        <div className="relative text-center text-primary-foreground z-10 p-4">
             <h1 className="text-5xl font-headline">Facilities & Services</h1>
-            <p className="text-lg text-white/90 mt-4 max-w-2xl mx-auto">
+            <p className="text-lg text-primary-foreground/90 mt-4 max-w-2xl mx-auto">
                 Designed for your well-being, our amenities offer a perfect blend of relaxation and recreation.
             </p>
         </div>

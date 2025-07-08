@@ -26,7 +26,7 @@ export function RecentActivityFeed({ activities }: { activities: Notification[] 
                     {activities.map((activity) => {
                         const Icon = getNotificationIcon(activity.href);
                         return (
-                            <Link key={activity.id} href={activity.href} className="flex items-start gap-4 hover:bg-muted/50 p-2 -m-2 rounded-lg transition-colors">
+                            <Link key={activity.id} href={activity.href} className="flex items-start gap-4 hover:bg-secondary p-2 -m-2 rounded-lg transition-colors">
                                 <div className="bg-muted p-2 rounded-full mt-1">
                                   <Icon className="w-5 h-5 text-muted-foreground" />
                                 </div>

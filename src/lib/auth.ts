@@ -7,12 +7,13 @@ import { db } from './firebase';
 import { doc, getDoc } from 'firebase/firestore';
 
 const secret = process.env.JWT_SECRET_KEY;
-if (!secret) {
-  throw new Error('JWT_SECRET_KEY is not set in the environment variables.');
-}
+
 const key = new TextEncoder().encode(secret);
 
 export async function encrypt(payload: Omit<SessionPayload, 'iat' | 'exp'>) {
+    if (!secret) {
+        throw new Error('JWT_SECRET_KEY is not set in the environment variables.');
+    }
   return await new SignJWT(payload)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -21,6 +22,11 @@ export async function encrypt(payload: Omit<SessionPayload, 'iat' | 'exp'>) {
 }
 
 export async function decrypt(input: string): Promise<SessionPayload | null> {
+    if (!secret) {
+        // This case should not be reached if the app is configured correctly.
+        console.error('JWT_SECRET_KEY is not set. Cannot decrypt token.');
+        return null;
+    }
   try {
     const { payload } = await jwtVerify(input, key, {
       algorithms: ['HS256'],

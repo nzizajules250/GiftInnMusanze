@@ -58,12 +58,12 @@ export default async function SearchResultsPage({
     // If no search params, show the booking form to prompt a search.
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-5xl font-headline">Find Your Perfect Room</h1>
+        <h1 className="text-5xl font-headline text-primary">Find Your Perfect Room</h1>
         <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
           Use the form below to check availability and find the ideal room for
           your stay.
         </p>
-        <div className="mt-8">
+        <div className="mt-8 max-w-4xl mx-auto">
             <BookingForm />
         </div>
       </div>
@@ -73,13 +73,13 @@ export default async function SearchResultsPage({
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-headline">{title}</h1>
+        <h1 className="text-5xl font-headline text-primary">{title}</h1>
         <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
           {description}
         </p>
       </div>
       
-      <div className="mb-12">
+      <div className="mb-12 max-w-4xl mx-auto">
          <BookingForm />
       </div>
 

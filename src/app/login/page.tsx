@@ -15,7 +15,7 @@ export default function LoginPage({ searchParams }: { searchParams: { [key: stri
         </CardHeader>
         <CardContent className="space-y-4">
           {bookingSuccess && (
-            <Alert className="border-green-500 bg-green-50 text-green-900">
+            <Alert className="border-green-500 bg-green-50 text-green-900 dark:bg-green-900/20 dark:text-green-200 dark:border-green-800">
                 <CheckCircle className="h-4 w-4 text-green-500" />
                 <AlertTitle className="font-semibold">Booking Successful!</AlertTitle>
                 <AlertDescription>

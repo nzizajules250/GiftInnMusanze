@@ -93,7 +93,7 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
             <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none">Check-in</label><Skeleton className="h-10 w-full" /></div>
             <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none">Check-out</label><Skeleton className="h-10 w-full" /></div>
             <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none">Guests</label><Skeleton className="h-10 w-full" /></div>
-            <Skeleton className="h-10 w-full bg-accent" />
+            <Skeleton className="h-10 w-full bg-primary" />
         </div>
     );
     if (isPopover) return <div className="p-1">{SkeletonLoader}</div>;
@@ -198,7 +198,7 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
                 </FormItem>
               )}
             />
-          <Button type="submit" className={cn(!isPopover && "h-10 bg-accent hover:bg-accent/90 text-accent-foreground")}>Check Availability</Button>
+          <Button type="submit" className={cn(!isPopover && "h-10")}>Check Availability</Button>
         </form>
       </Form>
   )

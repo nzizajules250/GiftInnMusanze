@@ -111,7 +111,7 @@ export function ContactForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="animate-spin mr-2" />}
             Submit
         </Button>

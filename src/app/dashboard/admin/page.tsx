@@ -1,6 +1,6 @@
 import { StatCard } from "@/components/dashboard/StatCard";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
-import { DollarSign, BedDouble, Sparkles, CalendarCheck, MessageSquare } from "lucide-react";
+import { DollarSign, BedDouble, CalendarCheck, MessageSquare } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getRooms, getAmenities, getBookings, getMessagesForAdmin, getAdminNotifications } from "@/lib/firebase-service";
 import { RoomsTab } from "@/components/dashboard/admin/RoomsTab";

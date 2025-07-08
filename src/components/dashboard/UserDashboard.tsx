@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import Image from "next/image";
@@ -66,7 +66,7 @@ export function UserDashboard({ user, userBookings, rooms }: UserDashboardProps)
                                                 <p className="text-sm text-muted-foreground">
                                                     {format(booking.checkIn, 'PPP')} - {format(booking.checkOut, 'PPP')}
                                                 </p>
-                                                <p className="text-sm font-bold mt-2">${booking.total.toFixed(2)}</p>
+                                                <p className="text-sm font-bold mt-2 text-primary">${booking.total.toFixed(2)}</p>
                                             </div>
                                             <div className="flex flex-col items-end gap-2">
                                                 <Badge variant={booking.status === 'Confirmed' ? 'default' : booking.status === 'Cancelled' ? 'destructive' : 'secondary'}>
@@ -105,12 +105,12 @@ export function UserDashboard({ user, userBookings, rooms }: UserDashboardProps)
                                 <CardTitle>{user.name}</CardTitle>
                                 <CardDescription>{user.email}</CardDescription>
                             </CardHeader>
-                            <CardContent className="flex flex-col space-y-2">
-                                <Button asChild>
+                            <CardFooter className="flex flex-col space-y-2">
+                                <Button asChild className="w-full">
                                     <Link href="/dashboard/profile">Edit Profile</Link>
                                 </Button>
-                                <Button variant="outline" disabled>View Booking History</Button>
-                            </CardContent>
+                                <Button variant="outline" className="w-full" disabled>View Booking History</Button>
+                            </CardFooter>
                         </Card>
                     </div>
                 </div>
