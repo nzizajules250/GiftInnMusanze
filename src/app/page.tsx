@@ -15,9 +15,9 @@ import { AnimatedTitle } from "@/components/AnimatedTitle";
 export const dynamic = 'force-dynamic';
 
 const heroImages = [
-  { src: "https://placehold.co/1600x800.png", alt: "Modern hotel lobby with elegant seating", hint: "hotel lobby" },
-  { src: "https://placehold.co/1600x800.png", alt: "Luxurious hotel suite with a city view", hint: "hotel suite" },
-  { src: "https://placehold.co/1600x800.png", alt: "Rooftop pool with a stunning sunset view", hint: "rooftop pool" },
+  { src: "https://i.ibb.co/1fG22y5r/18.jpg", alt: "Modern hotel lobby with elegant seating", hint: "hotel lobby" },
+  { src: "https://i.ibb.co/KxtvRtpw/17.jpg", alt: "Luxurious hotel suite with a city view", hint: "hotel suite" },
+  { src: "https://i.ibb.co/d040XfHm/IMG-20250705-102438-057.jpg", alt: "Rooftop pool with a stunning sunset view", hint: "rooftop pool" },
 ];
 
 export default async function Home() {
