@@ -5,9 +5,6 @@ export const config = {
   matcher: '/dashboard/:path*',
 };
 
-// Force middleware to run on Node.js runtime to support Firebase SDK
-export const runtime = 'nodejs';
-
 export async function middleware(request: NextRequest) {
   const session = await getSession();
   const { pathname } = request.nextUrl;

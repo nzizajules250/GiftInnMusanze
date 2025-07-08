@@ -1,27 +1,35 @@
 import 'server-only';
 import { cookies } from 'next/headers';
+import { SignJWT, jwtVerify } from 'jose';
 import type { SessionPayload } from './types';
 import { redirect } from 'next/navigation';
 import { db } from './firebase';
-import { doc, getDoc, setDoc, deleteDoc, Timestamp } from 'firebase/firestore';
-import { randomBytes } from 'crypto';
+import { doc, getDoc } from 'firebase/firestore';
 
-const aDayInSeconds = 24 * 60 * 60;
+const secret = process.env.JWT_SECRET_KEY;
+if (!secret) {
+  throw new Error('JWT_SECRET_KEY is not set in the environment variables.');
+}
+const key = new TextEncoder().encode(secret);
 
-// This function will create a new session document in Firestore
-async function createSessionInFirestore(userId: string, role: 'admin' | 'guest', email: string) {
-    const sessionId = randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + aDayInSeconds * 1000);
-    
-    const sessionDocRef = doc(db, 'sessions', sessionId);
-    await setDoc(sessionDocRef, {
-        userId,
-        role,
-        email,
-        expires: Timestamp.fromDate(expires),
+export async function encrypt(payload: Omit<SessionPayload, 'iat' | 'exp'>) {
+  return await new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime('1d')
+    .sign(key);
+}
+
+export async function decrypt(input: string): Promise<SessionPayload | null> {
+  try {
+    const { payload } = await jwtVerify(input, key, {
+      algorithms: ['HS256'],
     });
-
-    return { sessionId, expires };
+    return payload as SessionPayload;
+  } catch (error) {
+    // This is expected for invalid/expired tokens
+    return null;
+  }
 }
 
 export async function createSession(userId: string, role: 'admin' | 'guest') {
@@ -34,59 +42,30 @@ export async function createSession(userId: string, role: 'admin' | 'guest') {
       }
   }
 
-  const { sessionId, expires } = await createSessionInFirestore(userId, role, email);
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  const sessionData = { userId, role, email };
   
-  cookies().set('session', sessionId, {
-    expires,
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    sameSite: 'lax',
-  });
+  const session = await encrypt(sessionData);
+
+  cookies().set('session', session, { expires, httpOnly: true, path: '/' });
 }
 
 export async function getSession(): Promise<SessionPayload | null> {
-  const sessionId = cookies().get('session')?.value;
-  if (!sessionId) {
-    return null;
-  }
+  const sessionCookie = cookies().get('session')?.value;
+  if (!sessionCookie) return null;
+  
+  const session = await decrypt(sessionCookie);
 
-  const sessionDocRef = doc(db, 'sessions', sessionId);
-  const sessionSnapshot = await getDoc(sessionDocRef);
+  if (!session) return null;
+  
+  // Refresh cookie expiration
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+  cookies().set('session', sessionCookie, { expires, httpOnly: true, path: '/' });
 
-  if (!sessionSnapshot.exists()) {
-    // Session doesn't exist in DB, treat as logged out.
-    // The invalid cookie will be overwritten on next login.
-    return null;
-  }
-
-  const sessionData = sessionSnapshot.data();
-  const expires = (sessionData.expires as Timestamp).toDate();
-
-  if (expires < new Date()) {
-    // Session has expired, delete it from Firestore but don't touch cookies here.
-    await deleteDoc(sessionDocRef);
-    return null;
-  }
-
-  return {
-    userId: sessionData.userId,
-    role: sessionData.role,
-    email: sessionData.email,
-    expires: expires,
-  };
+  return session;
 }
 
 export async function deleteSession() {
-  const sessionId = cookies().get('session')?.value;
-  if (sessionId) {
-      try {
-        const sessionDocRef = doc(db, 'sessions', sessionId);
-        await deleteDoc(sessionDocRef);
-      } catch (error) {
-          console.error("Failed to delete session from Firestore:", error);
-      }
-  }
-  cookies().delete('session');
+  cookies().set('session', '', { expires: new Date(0), path: '/' });
   redirect('/login');
 }

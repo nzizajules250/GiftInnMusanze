@@ -55,7 +55,8 @@ export type SessionPayload = {
     userId: string;
     role: 'admin' | 'guest';
     email: string;
-    expires: Date;
+    iat?: number;
+    exp?: number;
 };
 
 export type UserProfile = {
