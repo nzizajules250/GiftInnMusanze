@@ -19,7 +19,7 @@ export default async function AmenitiesPage() {
           />
         <div className="absolute inset-0 bg-primary/40" />
         <div className="relative text-center text-primary-foreground z-10 p-4">
-            <h1 className="text-5xl font-headline">Facilities & Services</h1>
+            <h1 className="text-4xl sm:text-5xl font-headline">Facilities & Services</h1>
             <p className="text-lg text-primary-foreground/90 mt-4 max-w-2xl mx-auto">
                 Designed for your well-being, our amenities offer a perfect blend of relaxation and recreation.
             </p>

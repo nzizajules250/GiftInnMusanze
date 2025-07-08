@@ -70,14 +70,9 @@ export default async function Header() {
                     <Button type="submit" variant="ghost">Logout</Button>
                 </form>
             ) : (
-                <>
                  <Button asChild variant="ghost" className="hidden md:inline-flex">
                     <Link href="/login">Login</Link>
                  </Button>
-                 <Button asChild className="hidden md:inline-flex">
-                    <Link href="/register">Admin Register</Link>
-                 </Button>
-                </>
             )}
          
           <Sheet>
@@ -113,14 +108,9 @@ export default async function Header() {
                         <Button type="submit" className="w-full justify-start" variant="outline">Logout</Button>
                     </form>
                  ) : (
-                    <>
-                        <Button asChild className="w-full justify-start">
-                           <Link href="/login">Login</Link>
-                        </Button>
-                        <Button asChild variant="outline" className="w-full justify-start">
-                           <Link href="/register">Admin Register</Link>
-                        </Button>
-                    </>
+                    <Button asChild className="w-full justify-start">
+                        <Link href="/login">Login</Link>
+                    </Button>
                  )}
               </div>
             </SheetContent>

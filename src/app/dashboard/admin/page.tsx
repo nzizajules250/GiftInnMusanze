@@ -25,7 +25,7 @@ export default async function AdminDashboardPage() {
 
     return (
         <div className="flex flex-col gap-8">
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold">Admin Dashboard</h1>
 
             <Tabs defaultValue="overview" className="flex flex-col">
                 <div className="w-full overflow-x-auto">

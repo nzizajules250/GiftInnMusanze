@@ -11,7 +11,7 @@ export default async function AttractionsPage() {
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="text-center mb-12">
-        <h1 className="text-5xl font-headline text-primary">Explore the Neighborhood</h1>
+        <h1 className="text-4xl sm:text-5xl font-headline text-primary">Explore the Neighborhood</h1>
         <p className="text-lg text-muted-foreground mt-4 max-w-2xl mx-auto">
           Gift Inn is perfectly situated to offer you the best of the city, from cultural landmarks to natural retreats.
         </p>
