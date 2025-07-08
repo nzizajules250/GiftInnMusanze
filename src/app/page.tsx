@@ -1,24 +1,11 @@
-import Image from "next/image";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from "@/components/ui/carousel";
 import { BookingForm } from "@/components/BookingForm";
 import { getRooms, getAmenities, getBookings } from "@/lib/firebase-service";
 import { RoomCard } from "@/components/RoomCard";
 import { AmenityCard } from "@/components/AmenityCard";
 import { AnimatedTitle } from "@/components/AnimatedTitle";
+import { HeroCarousel } from "@/components/HeroCarousel";
 
 export const dynamic = 'force-dynamic';
-
-const heroImages = [
-  { src: "https://i.ibb.co/1fG22y5r/18.jpg", alt: "Modern hotel lobby with elegant seating", hint: "hotel lobby" },
-  { src: "https://i.ibb.co/KxtvRtpw/17.jpg", alt: "Luxurious hotel suite with a city view", hint: "hotel suite" },
-  { src: "https://i.ibb.co/d040XfHm/IMG-20250705-102438-057.jpg", alt: "Rooftop pool with a stunning sunset view", hint: "rooftop pool" },
-];
 
 export default async function Home() {
   const [rooms, amenities, bookings] = await Promise.all([getRooms(), getAmenities(), getBookings()]);
@@ -44,28 +31,8 @@ export default async function Home() {
   return (
     <div className="flex flex-col">
       <section className="relative w-full h-[60vh] md:h-[80vh]">
-        <Carousel className="w-full h-full" opts={{ loop: true }}>
-          <CarouselContent>
-            {heroImages.map((image, index) => (
-              <CarouselItem key={index}>
-                <div className="w-full h-[60vh] md:h-[80vh]">
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
-                    data-ai-hint={image.hint}
-                    fill
-                    className="object-cover"
-                    priority={index === 0}
-                  />
-                  <div className="absolute inset-0 bg-black/40" />
-                </div>
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10 hidden md:flex" />
-          <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 hidden md:flex" />
-        </Carousel>
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4 z-10">
+        <HeroCarousel />
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white p-4 z-10 pointer-events-none">
           <AnimatedTitle 
             text="Welcome to Gift Inn" 
             className="font-headline text-5xl md:text-7xl lg:text-8xl drop-shadow-lg"
