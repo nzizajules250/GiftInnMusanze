@@ -1,20 +1,37 @@
 import { db } from './firebase';
-import { collection, getDocs, query, where, addDoc, doc, getDoc, updateDoc, deleteDoc, setDoc, Timestamp, writeBatch, orderBy, limit } from 'firebase/firestore';
+import { 
+    collection, 
+    getDocs, 
+    query, 
+    where, 
+    addDoc, 
+    doc, 
+    getDoc, 
+    updateDoc, 
+    deleteDoc, 
+    setDoc, 
+    Timestamp, 
+    writeBatch, 
+    orderBy, 
+    limit,
+    type DocumentSnapshot,
+    type QueryDocumentSnapshot
+} from 'firebase/firestore';
 import type { Room, Booking, Amenity, Attraction, Admin, SessionPayload, ContactMessage, Notification, UserProfile } from './types';
-import { getIcon } from './icons';
 
-const parseDocWithDateConversion = (doc: any) => {
-    const data = doc.data();
-    for (const key in data) {
-        if (data[key] instanceof Timestamp) {
-            data[key] = data[key].toDate();
+const parseDocWithDateConversion = <T>(doc: DocumentSnapshot | QueryDocumentSnapshot): T => {
+    const data = doc.data() as object;
+    const processedData: { [key: string]: any } = { ...data };
+    for (const key in processedData) {
+        if (processedData[key] instanceof Timestamp) {
+            processedData[key] = (processedData[key] as Timestamp).toDate();
         }
     }
-    return { id: doc.id, ...data };
+    return { id: doc.id, ...processedData } as T;
 };
 
-const transformRoomData = (doc: any) => {
-    let data = parseDocWithDateConversion(doc) as any;
+const transformRoomData = (doc: DocumentSnapshot | QueryDocumentSnapshot): Room => {
+    const data = parseDocWithDateConversion<any>(doc);
     if (data.image && !data.images) {
         data.images = [{ url: data.image, hint: data.hint || '' }];
         delete data.image;
@@ -23,14 +40,14 @@ const transformRoomData = (doc: any) => {
     if (!data.images) {
         data.images = [];
     }
-    return data;
+    return data as Room;
 }
 
 export async function getRooms(): Promise<Room[]> {
   const roomsCollection = collection(db, 'rooms');
   const roomsSnapshot = await getDocs(roomsCollection);
   const roomsList = roomsSnapshot.docs.map(transformRoomData);
-  return roomsList as Room[];
+  return roomsList;
 }
 
 export async function getRoomById(id: string): Promise<Room | null> {
@@ -39,7 +56,7 @@ export async function getRoomById(id: string): Promise<Room | null> {
     if (!roomSnapshot.exists()) {
         return null;
     }
-    return transformRoomData(roomSnapshot) as Room;
+    return transformRoomData(roomSnapshot);
 }
 
 export async function getBookingById(id: string): Promise<Booking | null> {
@@ -48,28 +65,25 @@ export async function getBookingById(id: string): Promise<Booking | null> {
     if (!bookingSnapshot.exists()) {
         return null;
     }
-    return parseDocWithDateConversion(bookingSnapshot) as Booking;
+    return parseDocWithDateConversion<Booking>(bookingSnapshot);
 }
 
 export async function getAmenities(): Promise<Amenity[]> {
     const amenitiesCollection = collection(db, 'amenities');
     const amenitiesSnapshot = await getDocs(amenitiesCollection);
-    const amenitiesList = amenitiesSnapshot.docs.map(doc => parseDocWithDateConversion(doc));
-    return amenitiesList as Amenity[];
+    return amenitiesSnapshot.docs.map(doc => parseDocWithDateConversion<Amenity>(doc));
 }
 
 export async function getAttractions(): Promise<Attraction[]> {
     const attractionsCollection = collection(db, 'attractions');
     const attractionsSnapshot = await getDocs(attractionsCollection);
-    const attractionsList = attractionsSnapshot.docs.map(doc => parseDocWithDateConversion(doc));
-    return attractionsList as Attraction[];
+    return attractionsSnapshot.docs.map(doc => parseDocWithDateConversion<Attraction>(doc));
 }
 
 export async function getBookings(): Promise<Booking[]> {
     const bookingsCollection = collection(db, 'bookings');
     const bookingsSnapshot = await getDocs(bookingsCollection);
-    const bookingsList = bookingsSnapshot.docs.map(doc => parseDocWithDateConversion(doc));
-    return bookingsList as Booking[];
+    return bookingsSnapshot.docs.map(doc => parseDocWithDateConversion<Booking>(doc));
 }
 
 export async function getUserBookings(session: SessionPayload | null): Promise<Booking[]> {
@@ -86,7 +100,7 @@ export async function getUserBookings(session: SessionPayload | null): Promise<B
     const bookingDocRef = doc(db, 'bookings', session.userId);
     const bookingSnapshot = await getDoc(bookingDocRef);
     if (bookingSnapshot.exists()) {
-        return [parseDocWithDateConversion(bookingSnapshot) as Booking];
+        return [parseDocWithDateConversion<Booking>(bookingSnapshot)];
     }
     
     // Fallback if guest's booking is not found
@@ -144,7 +158,7 @@ export async function findBookingForLogin(guestName: string, guestIdNumber: stri
         return null;
     }
     // Assuming the combination is unique, return the first match
-    return parseDocWithDateConversion(snapshot.docs[0]) as Booking;
+    return parseDocWithDateConversion<Booking>(snapshot.docs[0]);
 }
 
 export async function findAdminByEmail(email: string): Promise<Admin | null> {
@@ -153,13 +167,13 @@ export async function findAdminByEmail(email: string): Promise<Admin | null> {
     if (snapshot.empty) {
         return null;
     }
-    return parseDocWithDateConversion(snapshot.docs[0]) as Admin;
+    return parseDocWithDateConversion<Admin>(snapshot.docs[0]);
 }
 
 export async function findAdmins(): Promise<Admin[]> {
     const adminsCollection = collection(db, 'admins');
     const adminsSnapshot = await getDocs(adminsCollection);
-    return adminsSnapshot.docs.map(doc => parseDocWithDateConversion(doc)) as Admin[];
+    return adminsSnapshot.docs.map(doc => parseDocWithDateConversion<Admin>(doc));
 }
 
 export async function createAdminUserInFirestore(email: string, passwordHash: string): Promise<string> {
@@ -203,14 +217,16 @@ export async function createBooking(bookingData: NewBookingData): Promise<string
 // Admin management functions
 
 export async function saveRoom(room: Omit<Room, 'id'> & { id?: string }) {
-    const roomDataToSave: any = { ...room };
-    delete roomDataToSave.image;
-    delete roomDataToSave.hint;
+    const roomDataToSave: Omit<Room, 'id'> = {
+        name: room.name,
+        description: room.description,
+        price: room.price,
+        images: room.images,
+    };
 
     if (room.id) {
         const roomDocRef = doc(db, 'rooms', room.id);
-        const { id, ...roomData } = roomDataToSave;
-        await setDoc(roomDocRef, roomData);
+        await setDoc(roomDocRef, roomDataToSave);
     } else {
         await addDoc(collection(db, 'rooms'), roomDataToSave);
     }
@@ -255,8 +271,7 @@ export async function saveContactMessage(message: NewContactMessage): Promise<st
 export async function getMessagesForAdmin(): Promise<ContactMessage[]> {
     const messagesCollection = collection(db, 'contactMessages');
     const messagesSnapshot = await getDocs(messagesCollection);
-    const messagesList = messagesSnapshot.docs.map(doc => parseDocWithDateConversion(doc));
-    return messagesList as ContactMessage[];
+    return messagesSnapshot.docs.map(doc => parseDocWithDateConversion<ContactMessage>(doc));
 }
 
 export async function markMessageAsRead(messageId: string): Promise<void> {
@@ -295,7 +310,7 @@ export async function getAdminNotifications(): Promise<Notification[]> {
         return [];
     }
 
-    return snapshot.docs.map(doc => parseDocWithDateConversion(doc)) as Notification[];
+    return snapshot.docs.map(doc => parseDocWithDateConversion<Notification>(doc));
 }
 
 export async function markNotificationsAsRead(userId: string): Promise<void> {
