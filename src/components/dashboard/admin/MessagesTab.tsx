@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { format } from "date-fns";
 import { markMessageAsReadAction } from "@/lib/actions";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { Badge } from "@/components/ui/badge";
 
 export function MessagesTab({ messages: initialMessages }: { messages: ContactMessage[] }) {
@@ -24,6 +24,8 @@ export function MessagesTab({ messages: initialMessages }: { messages: ContactMe
             toast({ title: "Error", description: result.error, variant: "destructive" });
         }
     };
+    
+    const sortedMessages = [...messages].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     return (
         <Card>
@@ -33,7 +35,7 @@ export function MessagesTab({ messages: initialMessages }: { messages: ContactMe
             </CardHeader>
             <CardContent>
                 <Accordion type="multiple" className="w-full">
-                    {messages.sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime()).map((message) => (
+                    {sortedMessages.map((message) => (
                         <AccordionItem value={message.id} key={message.id}>
                             <AccordionTrigger className="w-full text-left hover:no-underline">
                                <div className="flex flex-col items-start gap-1 sm:flex-row sm:items-center justify-between w-full pr-4">

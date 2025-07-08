@@ -12,16 +12,8 @@ import { markNotificationsAsReadAction } from "@/lib/actions";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { parseDocWithDateConversion } from "@/lib/firebase-service";
 
-const parseDocWithDateConversion = (doc: any) => {
-    const data = doc.data();
-    for (const key in data) {
-        if (data[key] && typeof data[key].toDate === 'function') {
-            data[key] = data[key].toDate();
-        }
-    }
-    return { id: doc.id, ...data };
-};
 
 export function NotificationBell({ session }: { session: SessionPayload }) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -40,7 +32,7 @@ export function NotificationBell({ session }: { session: SessionPayload }) {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newNotifications = snapshot.docs.map(doc => parseDocWithDateConversion(doc)) as Notification[];
+      const newNotifications = snapshot.docs.map(doc => parseDocWithDateConversion<Notification>(doc));
       
       setNotifications(prevNotifications => {
           if (isInitialMount.current) {

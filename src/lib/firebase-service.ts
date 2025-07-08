@@ -19,7 +19,7 @@ import {
 } from 'firebase/firestore';
 import type { Room, Booking, Amenity, Attraction, Admin, SessionPayload, ContactMessage, Notification, UserProfile } from './types';
 
-const parseDocWithDateConversion = <T>(doc: DocumentSnapshot | QueryDocumentSnapshot): T => {
+export const parseDocWithDateConversion = <T>(doc: DocumentSnapshot | QueryDocumentSnapshot): T => {
     const data = doc.data() as object;
     const processedData: { [key: string]: any } = { ...data };
     for (const key in processedData) {
