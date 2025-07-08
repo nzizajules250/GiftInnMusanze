@@ -25,6 +25,9 @@ const literata = Literata({
 export const metadata: Metadata = {
   title: "Gift Inn",
   description: "Experience tranquility and luxury at Gift Inn, your home away from home.",
+  icons: {
+    icon: 'data:;base64,iVBORw0KGgo='
+  }
 };
 
 export default function RootLayout({
@@ -34,9 +37,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="icon" href="data:;base64,iVBORw0KGgo=" />
-      </head>
       <body
         className={cn(
           "min-h-screen bg-background antialiased",

@@ -19,7 +19,7 @@ import {
   getBookingById,
   updateUserProfile,
 } from './firebase-service';
-import { createSession, deleteSession, getSession } from './auth';
+import { createSession, logoutAction } from './auth';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
@@ -51,7 +51,7 @@ export async function guestLoginAction(values: z.infer<typeof guestLoginSchema>)
       };
     }
 
-    await createSession(booking.id, 'guest');
+    await createSession(booking.id, 'guest', `guest-${booking.id}@giftinn.local`);
     redirect('/dashboard');
   } catch (e: any) {
     if (e.digest?.includes('NEXT_REDIRECT')) {
@@ -87,7 +87,7 @@ export async function adminLoginAction(values: z.infer<typeof adminLoginSchema>)
         return { error: 'Invalid credentials.' };
         }
 
-        await createSession(admin.id, 'admin');
+        await createSession(admin.id, 'admin', admin.email);
         redirect('/dashboard/admin');
     } catch (e: any) {
         if (e.digest?.includes('NEXT_REDIRECT')) {
@@ -128,7 +128,7 @@ export async function adminRegisterAction(
         const passwordHash = await bcrypt.hash(password, 10);
         const adminId = await createAdminUserInFirestore(email, passwordHash);
 
-        await createSession(adminId, 'admin');
+        await createSession(adminId, 'admin', email);
         redirect('/dashboard/admin');
     } catch (e: any) {
         if (e.digest?.includes('NEXT_REDIRECT')) {
@@ -142,9 +142,7 @@ export async function adminRegisterAction(
     }
 }
 
-export async function logoutAction() {
-  await deleteSession();
-}
+export { logoutAction };
 
 
 const createBookingSchema = z.object({
