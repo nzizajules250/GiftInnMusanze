@@ -1,24 +1,22 @@
-
 import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { Belleza, Literata } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { Playfair_Display, Inter } from "next/font/google";
 
-const belleza = Belleza({
+const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   display: "swap",
-  weight: "400",
-  variable: "--font-belleza",
+  variable: "--font-playfair-display",
 });
 
-const literata = Literata({
+const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-literata",
+  variable: "--font-inter",
 });
 
 
@@ -40,8 +38,8 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background antialiased",
-          belleza.variable,
-          literata.variable
+          playfairDisplay.variable,
+          inter.variable
         )}
       >
         <ThemeProvider

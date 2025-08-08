@@ -1,14 +1,11 @@
 import Link from "next/link";
-import { BedDouble, Menu } from "lucide-react";
+import { BedDouble, Menu, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { getSession } from "@/lib/auth";
 import { logoutAction } from "@/lib/actions";
-import { NotificationBell } from "./NotificationBell";
 import { ModeToggle } from "./ModeToggle";
 import { Separator } from "@/components/ui/separator";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { BookingForm } from "../BookingForm";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -23,98 +20,82 @@ export default async function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
-        <div className="mr-4 flex">
-          <Link href="/" className="mr-6 flex items-center space-x-2">
-            <span className="font-bold sm:inline-block font-headline text-2xl text-primary">
+      <div className="container flex h-20 items-center">
+        <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          {navLinks.slice(0, 2).map(({ href, label }) => (
+            <Link key={href} href={href} className="transition-colors hover:text-primary text-foreground/80">{label}</Link>
+          ))}
+        </div>
+
+        <div className="flex-1 flex justify-center">
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="font-bold sm:inline-block font-headline text-3xl text-primary">
               Gift Inn
             </span>
           </Link>
         </div>
-
-        <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          {navLinks.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-            >
-              {label}
-            </Link>
+        
+        <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          {navLinks.slice(2).map(({ href, label }) => (
+            <Link key={href} href={href} className="transition-colors hover:text-primary text-foreground/80">{label}</Link>
           ))}
-          {session && (
-             <Link href="/dashboard" className="transition-colors hover:text-foreground/80 text-foreground/60">
-                Dashboard
-             </Link>
-          )}
-        </nav>
-
-        <div className="flex flex-1 items-center justify-end space-x-2 md:space-x-4">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="secondary">
-                  <BedDouble className="mr-2 h-4 w-4" />
-                  Book a Room
+        </div>
+        
+        <div className="flex md:hidden flex-1 justify-end">
+             <Sheet>
+                <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6" />
+                    <span className="sr-only">Toggle Menu</span>
                 </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-96" align="end">
-                <h4 className="font-medium leading-none p-4 pb-0">Check Availability</h4>
-                <BookingForm isPopover={true} />
-              </PopoverContent>
-            </Popover>
+                </SheetTrigger>
+                <SheetContent side="left" className="pr-0 pt-12">
+                    <Link href="/" className="flex items-center mb-8 px-6">
+                        <span className="font-bold font-headline text-2xl text-primary">Gift Inn</span>
+                    </Link>
+                    <div className="flex flex-col space-y-3">
+                        {[...navLinks, ...(session ? [{href: "/dashboard", label: "Dashboard"}] : [])].map(({ href, label }) => (
+                        <Link key={href} href={href} className="text-lg font-medium px-6 py-2 hover:bg-secondary rounded-l-full transition-colors">
+                            {label}
+                        </Link>
+                        ))}
+                    </div>
+                    <Separator className="my-6" />
+                     <div className="px-6 flex flex-col space-y-3">
+                        {session ? (
+                            <form action={logoutAction}>
+                                <Button type="submit" className="w-full justify-start" variant="outline">Logout</Button>
+                            </form>
+                        ) : (
+                            <Button asChild className="w-full justify-start">
+                                <Link href="/login">Login</Link>
+                            </Button>
+                        )}
+                        <Button asChild variant="default" className="w-full justify-start">
+                             <Link href="/rooms/search"><BedDouble /> Book Now</Link>
+                        </Button>
+                    </div>
+                </SheetContent>
+            </Sheet>
+        </div>
 
+        <div className="hidden md:flex items-center justify-end space-x-2 ml-4">
             <ModeToggle />
-            {session && <NotificationBell session={session} />}
             {session ? (
+                <>
+                <Button asChild variant="outline"><Link href="/dashboard">Dashboard</Link></Button>
                  <form action={logoutAction}>
                     <Button type="submit" variant="ghost">Logout</Button>
                 </form>
+                </>
             ) : (
-                 <Button asChild variant="ghost" className="hidden md:inline-flex">
+                 <Button asChild variant="ghost">
                     <Link href="/login">Login</Link>
                  </Button>
             )}
-         
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button
-                variant="ghost"
-                className="md:hidden px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0"
-              >
-                <Menu className="h-6 w-6" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="pr-0 pt-12">
-              <SheetTitle className="sr-only">Menu</SheetTitle>
-              <Link href="/" className="flex items-center mb-8 px-6">
-                <span className="font-bold font-headline text-2xl text-primary">Gift Inn</span>
-              </Link>
-              <div className="flex flex-col space-y-3">
-                {[...navLinks, ...(session ? [{href: "/dashboard", label: "Dashboard"}] : [])].map(({ href, label }) => (
-                  <Link
-                    key={href}
-                    href={href}
-                    className="text-lg font-medium px-6 py-2 hover:bg-secondary rounded-l-full transition-colors"
-                  >
-                    {label}
-                  </Link>
-                ))}
-              </div>
-              <Separator className="my-6" />
-              <div className="px-6 flex flex-col space-y-3">
-                 {session ? (
-                     <form action={logoutAction}>
-                        <Button type="submit" className="w-full justify-start" variant="outline">Logout</Button>
-                    </form>
-                 ) : (
-                    <Button asChild className="w-full justify-start">
-                        <Link href="/login">Login</Link>
-                    </Button>
-                 )}
-              </div>
-            </SheetContent>
-          </Sheet>
+            <Button asChild className="bg-accent hover:bg-accent/90 text-accent-foreground">
+                <Link href="/rooms/search"><BedDouble /> Book Now</Link>
+            </Button>
         </div>
       </div>
     </header>

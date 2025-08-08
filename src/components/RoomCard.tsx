@@ -13,14 +13,14 @@ interface RoomCardProps {
 
 export function RoomCard({ room, isOccupied = false }: RoomCardProps) {
   return (
-    <Card className="flex flex-col overflow-hidden transition-shadow hover:shadow-xl duration-300">
-      <div className="relative w-full h-60">
+    <Card className="flex flex-col overflow-hidden transition-shadow hover:shadow-xl duration-300 group">
+      <div className="relative w-full h-60 overflow-hidden">
         <Image
           src={room.images?.[0]?.url || 'https://placehold.co/600x400.png'}
           alt={`View of ${room.name}`}
           data-ai-hint={room.images?.[0]?.hint}
           fill
-          className={cn("object-cover transition-transform duration-300 group-hover:scale-105", isOccupied && "brightness-50")}
+          className={cn("object-cover transition-transform duration-500 group-hover:scale-110", isOccupied && "brightness-50")}
         />
          {isOccupied && (
             <Badge variant="destructive" className="absolute top-3 right-3">Occupied</Badge>
@@ -28,12 +28,13 @@ export function RoomCard({ room, isOccupied = false }: RoomCardProps) {
       </div>
       <CardHeader>
         <CardTitle className="font-headline text-2xl text-primary">{room.name}</CardTitle>
-        <CardDescription className="pt-2">{room.description}</CardDescription>
+        <p className="text-lg font-bold text-primary/80 pt-1">${room.price}<span className="text-sm font-normal text-muted-foreground">/night</span></p>
       </CardHeader>
-      <CardContent className="flex-grow"></CardContent>
-      <CardFooter className="flex justify-between items-center bg-secondary/50 p-4">
-        <p className="text-xl font-bold">${room.price}<span className="text-sm font-normal text-muted-foreground">/night</span></p>
-        <Button asChild variant="default" disabled={isOccupied}>
+      <CardContent className="flex-grow">
+        <CardDescription className="line-clamp-3">{room.description}</CardDescription>
+      </CardContent>
+      <CardFooter className="p-4">
+        <Button asChild variant="default" className="w-full" disabled={isOccupied}>
           <Link href={`/rooms/${room.id}`} className={cn(isOccupied && "pointer-events-none")}>View Details</Link>
         </Button>
       </CardFooter>

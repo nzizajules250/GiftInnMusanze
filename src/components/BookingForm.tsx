@@ -97,7 +97,7 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
         </div>
     );
     if (isPopover) return <div className="p-1">{SkeletonLoader}</div>;
-    return <Card className="shadow-2xl max-w-4xl mx-auto"><CardContent className="p-6">{SkeletonLoader}</CardContent></Card>;
+    return <Card className="shadow-2xl max-w-5xl mx-auto"><CardContent className="p-6">{SkeletonLoader}</CardContent></Card>;
   }
   
   const FormContent = (
@@ -198,7 +198,7 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
                 </FormItem>
               )}
             />
-          <Button type="submit" className={cn(!isPopover && "h-10")}>Check Availability</Button>
+          <Button type="submit" className={cn("h-10 text-base", isPopover && "w-full")}>Check Availability</Button>
         </form>
       </Form>
   )
@@ -212,7 +212,7 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
   }
 
   return (
-    <Card className="shadow-2xl max-w-4xl mx-auto">
+    <Card className="shadow-2xl max-w-5xl mx-auto">
       <CardContent className="p-6">
         {FormContent}
       </CardContent>
