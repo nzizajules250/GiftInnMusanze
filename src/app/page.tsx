@@ -35,7 +35,7 @@ export default async function Home() {
     <div className="flex flex-col">
       <section className="relative w-full h-[70vh] md:h-[90vh]">
         <HeroCarousel />
-        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center text-white p-4 z-10 pointer-events-none">
+        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center text-white p-4 z-10">
           <AnimatedTitle 
             text="Welcome to Gift Inn" 
             className="font-headline text-5xl md:text-7xl lg:text-8xl drop-shadow-lg"
@@ -43,29 +43,9 @@ export default async function Home() {
           <p className="mt-4 text-lg md:text-2xl max-w-2xl drop-shadow-md">
             Your exclusive sanctuary for peace and luxury.
           </p>
-        </div>
-      </section>
-
-      <div className="transform -translate-y-20 z-20 w-full px-4">
-          <BookingForm />
-      </div>
-
-      <section className="container mx-auto px-4 py-16 -mt-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl sm:text-4xl font-headline text-primary mb-4">
-            Our Accommodations
-          </h2>
-          <p className="max-w-3xl mx-auto text-muted-foreground">Discover our collection of rooms, each designed to provide an unparalleled experience of comfort and elegance. Find the perfect space for your stay with us.</p>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {rooms.slice(0, 3).map((room) => (
-            <RoomCard key={room.id} room={room} isOccupied={occupiedRoomIds.has(room.id)} />
-          ))}
-        </div>
-        <div className="text-center mt-12">
-            <Button asChild size="lg" variant="outline">
-                <Link href="/rooms">View All Rooms</Link>
-            </Button>
+           <div className="mt-8 w-full max-w-5xl pointer-events-auto">
+             <BookingForm />
+           </div>
         </div>
       </section>
 
@@ -87,6 +67,25 @@ export default async function Home() {
                     </Button>
                 </div>
             </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 py-24">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl sm:text-4xl font-headline text-primary mb-4">
+            Our Accommodations
+          </h2>
+          <p className="max-w-3xl mx-auto text-muted-foreground">Discover our collection of rooms, each designed to provide an unparalleled experience of comfort and elegance. Find the perfect space for your stay with us.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {rooms.slice(0, 3).map((room) => (
+            <RoomCard key={room.id} room={room} isOccupied={occupiedRoomIds.has(room.id)} />
+          ))}
+        </div>
+        <div className="text-center mt-12">
+            <Button asChild size="lg" variant="outline">
+                <Link href="/rooms">View All Rooms</Link>
+            </Button>
         </div>
       </section>
 

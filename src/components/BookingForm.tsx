@@ -90,14 +90,14 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
             "grid items-end gap-4",
             isPopover ? "grid-cols-1" : "grid-cols-1 md:grid-cols-4"
         )}>
-            <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none">Check-in</label><Skeleton className="h-10 w-full" /></div>
-            <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none">Check-out</label><Skeleton className="h-10 w-full" /></div>
-            <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none">Guests</label><Skeleton className="h-10 w-full" /></div>
-            <Skeleton className="h-10 w-full bg-primary" />
+            <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none text-primary-foreground">Check-in</label><Skeleton className="h-10 w-full" /></div>
+            <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none text-primary-foreground">Check-out</label><Skeleton className="h-10 w-full" /></div>
+            <div className="flex flex-col space-y-2"><label className="text-sm font-medium leading-none text-primary-foreground">Guests</label><Skeleton className="h-10 w-full" /></div>
+            <Skeleton className="h-10 w-full bg-accent" />
         </div>
     );
     if (isPopover) return <div className="p-1">{SkeletonLoader}</div>;
-    return <Card className="shadow-2xl max-w-5xl mx-auto"><CardContent className="p-6">{SkeletonLoader}</CardContent></Card>;
+    return <Card className="shadow-2xl max-w-5xl mx-auto bg-primary/80 border-none"><CardContent className="p-6">{SkeletonLoader}</CardContent></Card>;
   }
   
   const FormContent = (
@@ -111,14 +111,14 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
               name="checkIn"
               render={({ field }) => (
                 <FormItem className="flex flex-col space-y-2">
-                  <FormLabel>Check-in</FormLabel>
+                  <FormLabel className="text-primary-foreground">Check-in</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-full justify-start text-left font-normal",
+                            "w-full justify-start text-left font-normal bg-card/90",
                             !field.value && "text-muted-foreground"
                           )}
                         >
@@ -145,14 +145,14 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
               name="checkOut"
               render={({ field }) => (
                 <FormItem className="flex flex-col space-y-2">
-                  <FormLabel>Check-out</FormLabel>
+                  <FormLabel className="text-primary-foreground">Check-out</FormLabel>
                    <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-full justify-start text-left font-normal",
+                            "w-full justify-start text-left font-normal bg-card/90",
                             !field.value && "text-muted-foreground"
                           )}
                         >
@@ -179,10 +179,10 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
               name="guests"
               render={({ field }) => (
                 <FormItem className="flex flex-col space-y-2">
-                  <FormLabel>Guests</FormLabel>
+                  <FormLabel className="text-primary-foreground">Guests</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="bg-card/90">
                         <Users className="mr-2 h-4 w-4" />
                         <SelectValue placeholder="Select guests" />
                       </SelectTrigger>
@@ -198,7 +198,7 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
                 </FormItem>
               )}
             />
-          <Button type="submit" className={cn("h-10 text-base", isPopover && "w-full")}>Check Availability</Button>
+          <Button type="submit" className={cn("h-10 text-base bg-accent hover:bg-accent/90", isPopover && "w-full")}>Check Availability</Button>
         </form>
       </Form>
   )
@@ -212,7 +212,7 @@ export function BookingForm({ isPopover = false }: BookingFormProps) {
   }
 
   return (
-    <Card className="shadow-2xl max-w-5xl mx-auto">
+    <Card className="shadow-2xl max-w-5xl mx-auto bg-primary/80 border-none">
       <CardContent className="p-6">
         {FormContent}
       </CardContent>
