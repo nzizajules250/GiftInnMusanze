@@ -59,7 +59,7 @@ export async function guestLoginAction(values: z.infer<typeof guestLoginSchema>)
     if (e.digest?.includes('NEXT_REDIRECT')) {
         throw e;
     }
-    console.error('Guest login error:', e);
+    console.error(e);
     return { error: e.message || 'An unexpected error occurred.' };
   }
 }
@@ -95,7 +95,7 @@ export async function adminLoginAction(values: z.infer<typeof adminLoginSchema>)
         if (e.digest?.includes('NEXT_REDIRECT')) {
             throw e;
         }
-        console.error('Admin login error:', e);
+        console.error(e);
         return { error: e.message || 'An unexpected error occurred.' };
     }
 }
@@ -136,7 +136,7 @@ export async function adminRegisterAction(
         if (e.digest?.includes('NEXT_REDIRECT')) {
             throw e;
         }
-        console.error('Admin registration error:', e);
+        console.error(e);
         return {
             error:
                 e.message || 'An unexpected error occurred during registration.',
@@ -197,7 +197,7 @@ export async function createBookingAction(values: z.infer<typeof createBookingSc
         if (e.digest?.includes('NEXT_REDIRECT')) {
             throw e;
         }
-        console.error('Booking creation error:', e);
+        console.error(e);
         return { error: e.message || 'An unexpected error occurred.' };
     }
 }
@@ -231,7 +231,7 @@ export async function contactFormAction(values: z.infer<typeof contactFormSchema
         revalidatePath('/dashboard/admin');
         return { success: true };
     } catch (e: any) {
-        console.error('Contact form error:', e);
+        console.error(e);
         return { success: false, error: e.message || 'An unexpected error occurred.' };
     }
 }
@@ -262,7 +262,7 @@ export async function saveRoomAction(roomData: z.infer<typeof roomSchema>) {
         revalidatePath('/');
         return { success: true };
     } catch (e: any) {
-        console.error('Save room error:', e);
+        console.error(e);
         return { success: false, error: e.message };
     }
 }
@@ -275,7 +275,7 @@ export async function deleteRoomAction(roomId: string) {
         revalidatePath('/');
         return { success: true };
     } catch (e: any) {
-        console.error('Delete room error:', e);
+        console.error(e);
         return { success: false, error: e.message };
     }
 }
@@ -287,7 +287,7 @@ export async function saveAmenityAction(amenityData: Omit<Amenity, 'id' | 'icon'
         revalidatePath('/amenities');
         return { success: true };
     } catch (e: any) {
-        console.error('Save amenity error:', e);
+        console.error(e);
         return { success: false, error: e.message };
     }
 }
@@ -299,7 +299,7 @@ export async function deleteAmenityAction(amenityId: string) {
         revalidatePath('/amenities');
         return { success: true };
     } catch (e: any) {
-        console.error('Delete amenity error:', e);
+        console.error(e);
         return { success: false, error: e.message };
     }
 }
@@ -340,7 +340,7 @@ export async function updateBookingStatusAction(bookingId: string, status: Booki
         revalidatePath('/dashboard/admin');
         return { success: true };
     } catch (e: any) {
-        console.error('Update booking status error:', e);
+        console.error(e);
         return { success: false, error: e.message };
     }
 }
@@ -352,7 +352,7 @@ export async function markMessageAsReadAction(messageId: string) {
         revalidatePath('/dashboard/admin');
         return { success: true };
     } catch (e: any) {
-        console.error('Mark message as read error:', e);
+        console.error(e);
         return { success: false, error: e.message };
     }
 }
@@ -363,7 +363,7 @@ export async function markNotificationsAsReadAction(userId: string) {
         revalidatePath('/dashboard'); // revalidate header
         return { success: true };
     } catch (e: any) {
-        console.error('Mark notifications as read error:', e);
+        console.error(e);
         return { success: false, error: e.message };
     }
 }
@@ -424,7 +424,7 @@ export async function updateUserProfileAction(values: z.infer<typeof profileForm
         return { success: true };
 
     } catch (e: any) {
-        console.error('Update profile error:', e);
+        console.error(e);
         return { success: false, error: e.message };
     }
 }
@@ -457,7 +457,7 @@ export async function cancelUserBookingAction(bookingId: string) {
         return { success: true };
 
     } catch (e: any) {
-        console.error('Cancel booking error:', e);
+        console.error(e);
         return { success: false, error: e.message };
     }
 }
@@ -469,15 +469,20 @@ const userSettingsSchema = z.object({
 });
 
 export async function updateUserSettingsAction(values: z.infer<typeof userSettingsSchema>) {
-    console.log("Updating user settings (simulated):", values);
-    // In a real app, you would save these settings to the user's profile in Firebase.
-    // For now, we'll simulate a successful save.
-    
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    revalidatePath('/dashboard/settings');
-    return { success: true };
+    try {
+        console.log("Updating user settings (simulated):", values);
+        // In a real app, you would save these settings to the user's profile in Firebase.
+        // For now, we'll simulate a successful save.
+        
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        revalidatePath('/dashboard/settings');
+        return { success: true };
+    } catch(e: any) {
+        console.error(e);
+        return { success: false, error: e.message };
+    }
 }
 
 export async function generateRoomDescriptionAction(roomName: string): Promise<{
@@ -489,7 +494,7 @@ export async function generateRoomDescriptionAction(roomName: string): Promise<{
         const description = await generateRoomDescription({ roomName });
         return { success: true, description: description.description };
     } catch(e: any) {
-        console.error('AI Description Generation Error:', e);
+        console.error(e);
         return { success: false, error: "Failed to generate description. Please try again." };
     }
 }
