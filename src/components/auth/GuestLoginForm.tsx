@@ -55,7 +55,7 @@ export function GuestLoginForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 pt-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="guestName"
@@ -69,32 +69,34 @@ export function GuestLoginForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="guestIdNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>ID Number</FormLabel>
-              <FormControl>
-                <Input placeholder="Provided at check-in" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="phoneNumber"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Phone Number</FormLabel>
-              <FormControl>
-                <Input placeholder="Used during booking" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="guestIdNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>ID Number</FormLabel>
+                <FormControl>
+                  <Input placeholder="Provided at check-in" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="phoneNumber"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Phone Number</FormLabel>
+                <FormControl>
+                  <Input placeholder="Used during booking" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
         <Button type="submit" className="w-full" disabled={loading}>
           {loading && <Loader2 className="animate-spin mr-2" />}
           Login as Guest
