@@ -1,3 +1,4 @@
+
 // src/components/layout/NotificationBell.tsx
 "use client";
 
@@ -32,29 +33,33 @@ export function NotificationBell({ session }: { session: SessionPayload }) {
     );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const newNotifications = snapshot.docs.map(doc => parseDocWithDateConversion<Notification>(doc));
+        const newNotifications = snapshot.docs.map(doc => parseDocWithDateConversion<Notification>(doc));
       
-      setNotifications(prevNotifications => {
-          if (isInitialMount.current) {
-              isInitialMount.current = false;
-          } else {
-              const newlyAdded = newNotifications.filter(
-                  newNotif => !prevNotifications.some(oldNotif => oldNotif.id === newNotif.id)
-              );
+        setNotifications(prevNotifications => {
+            if (isInitialMount.current) {
+                isInitialMount.current = false;
+            } else {
+                // Determine what's new *after* this state update.
+                // We'll use a separate effect to show the toast.
+                setTimeout(() => {
+                    const newlyAdded = newNotifications.filter(
+                        newNotif => !prevNotifications.some(oldNotif => oldNotif.id === newNotif.id)
+                    );
 
-              newlyAdded.forEach(notification => {
-                  if (!notification.isRead) {
-                      toast({
-                          title: "New Notification",
-                          description: notification.message
-                      });
-                  }
-              });
-          }
-          return newNotifications;
-      });
+                    newlyAdded.forEach(notification => {
+                        if (!notification.isRead) {
+                            toast({
+                                title: "New Notification",
+                                description: notification.message
+                            });
+                        }
+                    });
+                }, 0);
+            }
+            return newNotifications;
+        });
 
-      setUnreadCount(newNotifications.filter(n => !n.isRead).length);
+        setUnreadCount(newNotifications.filter(n => !n.isRead).length);
     });
 
     return () => unsubscribe();
