@@ -24,6 +24,7 @@ import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import type { Amenity, Booking } from './types';
+import { generateRoomDescription } from '@/ai/flows/room-description-flow';
 
 const guestLoginSchema = z.object({
   guestName: z.string().min(1, 'Guest name is required.'),
@@ -470,4 +471,18 @@ export async function updateUserSettingsAction(values: z.infer<typeof userSettin
     
     revalidatePath('/dashboard/settings');
     return { success: true };
+}
+
+export async function generateRoomDescriptionAction(roomName: string): Promise<{
+    success: boolean;
+    description?: string;
+    error?: string;
+}> {
+    try {
+        const description = await generateRoomDescription({ roomName });
+        return { success: true, description: description.description };
+    } catch(e: any) {
+        console.error('AI Description Generation Error:', e);
+        return { success: false, error: "Failed to generate description. Please try again." };
+    }
 }

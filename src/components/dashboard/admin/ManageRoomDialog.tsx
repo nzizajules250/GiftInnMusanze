@@ -18,10 +18,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { saveRoomAction } from "@/lib/actions";
-import { Loader2, PlusCircle, Trash2 } from "lucide-react";
+import { generateRoomDescriptionAction, saveRoomAction } from "@/lib/actions";
+import { Loader2, PlusCircle, Sparkles, Trash2 } from "lucide-react";
 import type { Room } from "@/lib/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 
 const imageSchema = z.object({
   url: z.string().url("Please enter a valid image URL."),
@@ -44,6 +46,7 @@ interface ManageRoomDialogProps {
 export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -71,7 +74,7 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
         images: [{ url: "https://placehold.co/600x400.png", hint: "" }]
       });
     }
-  }, [room, form]);
+  }, [room, form, isOpen]);
   
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
@@ -92,6 +95,26 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
     setLoading(false);
   }
 
+  async function handleGenerateDescription() {
+    const roomName = form.getValues("name");
+    if (!roomName) {
+        form.setError("name", { message: "Please enter a room name first." });
+        return;
+    }
+    setAiLoading(true);
+    const result = await generateRoomDescriptionAction(roomName);
+    if (result.success && result.description) {
+        form.setValue("description", result.description);
+    } else {
+        toast({
+            title: "AI Failed",
+            description: result.error,
+            variant: "destructive",
+        });
+    }
+    setAiLoading(false);
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="sm:max-w-2xl flex flex-col max-h-[90vh]">
@@ -106,7 +129,30 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
                             <FormItem><FormLabel>Room Name</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
                         )}/>
                         <FormField control={form.control} name="description" render={({ field }) => (
-                            <FormItem><FormLabel>Description</FormLabel><FormControl><Textarea {...field} /></FormControl><FormMessage /></FormItem>
+                            <FormItem>
+                                <div className="flex items-center justify-between">
+                                    <FormLabel>Description</FormLabel>
+                                    <TooltipProvider>
+                                        <Tooltip>
+                                            <TooltipTrigger asChild>
+                                                <Button type="button" variant="ghost" size="sm" onClick={handleGenerateDescription} disabled={aiLoading}>
+                                                    {aiLoading ? (
+                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                    ) : (
+                                                        <Sparkles className="h-4 w-4 text-accent" />
+                                                    )}
+                                                    <span className="sr-only">Generate with AI</span>
+                                                </Button>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <p>Generate with AI</p>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </div>
+                                <FormControl><Textarea {...field} rows={5} /></FormControl>
+                                <FormMessage />
+                            </FormItem>
                         )}/>
                         <FormField control={form.control} name="price" render={({ field }) => (
                             <FormItem><FormLabel>Price per night</FormLabel><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>
@@ -134,7 +180,7 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
                                     name={`images.${index}.hint`}
                                     render={({ field }) => (
                                         <FormItem>
-                                        <FormLabel className="text-xs font-normal">Image AI Hint</FormLabel>
+                                        <FormLabel className="text-xs font-normal">Image AI Hint (e.g., bedroom interior)</FormLabel>
                                         <FormControl><Input {...field} placeholder="e.g. hotel room" /></FormControl>
                                         <FormMessage />
                                         </FormItem>
