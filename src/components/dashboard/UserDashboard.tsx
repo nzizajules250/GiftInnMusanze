@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cancelUserBookingAction } from "@/lib/actions";
 import { DeleteConfirmationDialog } from "@/components/dashboard/admin/DeleteConfirmationDialog";
 import type { Booking, Room, UserProfile } from "@/lib/types";
+import { BookingConfirmation } from "./BookingConfirmation";
 
 interface UserDashboardProps {
     user: UserProfile;
@@ -39,7 +40,7 @@ export function UserDashboard({ user, userBookings, rooms }: UserDashboardProps)
             <div className="flex flex-col gap-8">
                 <h1 className="text-3xl font-bold">My Dashboard</h1>
                 <div className="grid gap-8 md:grid-cols-3">
-                    <div className="md:col-span-2">
+                    <div className="md:col-span-2 space-y-8">
                         <Card>
                             <CardHeader>
                                 <CardTitle>My Bookings</CardTitle>
@@ -93,6 +94,7 @@ export function UserDashboard({ user, userBookings, rooms }: UserDashboardProps)
                                 )}
                             </CardContent>
                         </Card>
+                        {userBookings.length > 0 && <BookingConfirmation />}
                     </div>
                     <div>
                         <Card>

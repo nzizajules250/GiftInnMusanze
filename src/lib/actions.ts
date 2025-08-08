@@ -19,13 +19,15 @@ import {
   getBookingById,
   updateUserProfile,
   findOverlappingBookings,
+  getUserBookings,
 } from './firebase-service';
-import { createSession, logoutAction } from './auth';
+import { createSession, getSession, logoutAction } from './auth';
 import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import type { Amenity, Booking } from './types';
 import { generateRoomDescription } from '@/ai/flows/room-description-flow';
+import { confirmBookingWithAI } from '@/ai/flows/booking-confirmation-flow';
 
 const guestLoginSchema = z.object({
   guestName: z.string().min(1, 'Guest name is required.'),
@@ -496,5 +498,30 @@ export async function generateRoomDescriptionAction(roomName: string): Promise<{
     } catch(e: any) {
         console.error(e);
         return { success: false, error: "Failed to generate description. Please try again." };
+    }
+}
+
+export async function confirmBookingWithAIAction(query: string): Promise<{
+    success: boolean;
+    response?: string;
+    error?: string;
+}> {
+    try {
+        const session = await getSession();
+        if (!session) {
+            return { success: false, error: "Authentication required." };
+        }
+        const userBookings = await getUserBookings(session);
+
+        const result = await confirmBookingWithAI({
+            query,
+            bookings: userBookings,
+        });
+
+        return { success: true, response: result.response };
+
+    } catch(e: any) {
+        console.error(e);
+        return { success: false, error: "The AI assistant is currently unavailable. Please try again later." };
     }
 }
