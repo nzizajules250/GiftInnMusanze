@@ -33,7 +33,7 @@ export default async function Home() {
 
   return (
     <div className="flex flex-col">
-      <section className="relative w-full h-[70vh] md:h-[90vh]">
+      <section className="relative w-full h-screen -mt-20">
         <HeroCarousel />
         <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center text-white p-4 z-10">
           <AnimatedTitle 

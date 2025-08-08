@@ -34,7 +34,7 @@ export function HeroCarousel() {
       <CarouselContent>
         {heroImages.map((image, index) => (
           <CarouselItem key={index}>
-            <div className="w-full h-[60vh] md:h-[80vh]">
+            <div className="w-full h-screen">
               <Image
                 src={image.src}
                 alt={image.alt}
