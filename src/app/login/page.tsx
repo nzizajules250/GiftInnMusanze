@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle } from "lucide-react";
 
-export default function LoginPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
+export default function LoginPage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
   const bookingSuccess = searchParams?.booking === 'success';
 
   return (
