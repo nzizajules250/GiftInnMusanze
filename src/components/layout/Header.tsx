@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BedDouble, Menu, Phone } from "lucide-react";
+import { BedDouble, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { getSession } from "@/lib/auth";
@@ -20,29 +20,18 @@ export default async function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-20 items-center">
-        <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          {navLinks.slice(0, 2).map(({ href, label }) => (
+      <div className="container flex h-20 items-center justify-between">
+        
+        {/* Desktop Nav - Left side */}
+        <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          {navLinks.map(({ href, label }) => (
             <Link key={href} href={href} className="transition-colors hover:text-primary text-foreground/80">{label}</Link>
           ))}
-        </div>
+        </nav>
 
-        <div className="flex-1 flex justify-center">
-          <Link href="/" className="flex items-center space-x-2">
-            <span className="font-bold sm:inline-block font-headline text-3xl text-primary">
-              Gift Inn
-            </span>
-          </Link>
-        </div>
-        
-        <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
-          {navLinks.slice(2).map(({ href, label }) => (
-            <Link key={href} href={href} className="transition-colors hover:text-primary text-foreground/80">{label}</Link>
-          ))}
-        </div>
-        
-        <div className="flex md:hidden flex-1 justify-end">
-             <Sheet>
+        {/* Mobile Nav - Hamburger */}
+        <div className="flex items-center md:hidden">
+            <Sheet>
                 <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
                     <Menu className="h-6 w-6" />
@@ -79,7 +68,17 @@ export default async function Header() {
             </Sheet>
         </div>
 
-        <div className="hidden md:flex items-center justify-end space-x-2 ml-4">
+        {/* Centered Logo */}
+        <div className="absolute left-1/2 -translate-x-1/2 md:relative md:left-auto md:translate-x-0">
+          <Link href="/" className="flex items-center space-x-2">
+            <span className="font-bold sm:inline-block font-headline text-3xl text-primary">
+              Gift Inn
+            </span>
+          </Link>
+        </div>
+        
+        {/* Desktop Nav - Right side */}
+        <div className="hidden md:flex items-center justify-end gap-2">
             <ModeToggle />
             {session ? (
                 <>
@@ -97,6 +96,10 @@ export default async function Header() {
                 <Link href="/rooms/search"><BedDouble /> Book Now</Link>
             </Button>
         </div>
+        
+        {/* Mobile - Right side placeholder to balance the hamburger menu */}
+        <div className="flex items-center md:hidden" style={{width: 40}}></div>
+
       </div>
     </header>
   );
