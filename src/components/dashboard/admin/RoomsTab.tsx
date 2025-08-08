@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -71,8 +72,8 @@ export function RoomsTab({ rooms }: { rooms: Room[] }) {
                                             alt={room.name} 
                                             width={64} 
                                             height={64} 
-                                            className="rounded-md object-cover" 
-                                            data-ai-hint={room.images?.[0]?.hint} />
+                                            className="rounded-md object-cover"
+                                        />
                                     </TableCell>
                                     <TableCell>
                                         <div className="font-medium">{room.name}</div>

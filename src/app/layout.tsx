@@ -1,3 +1,4 @@
+
 import type { Metadata } from "next";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -6,6 +7,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { Playfair_Display, Inter } from "next/font/google";
 import { AppProviders } from "./providers";
+import { CookieConsentBanner } from "@/components/layout/CookieConsentBanner";
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -49,6 +51,7 @@ export default function RootLayout({
             <Footer />
           </div>
           <Toaster />
+          <CookieConsentBanner />
         </AppProviders>
       </body>
     </html>
