@@ -108,7 +108,7 @@ export async function getUserBookings(session: SessionPayload | null): Promise<B
 }
 
 
-export async function getUserProfile(session: SessionPayload): Promise<UserProfile> {
+export async function getUserProfile(session: SessionPayload): Promise<UserProfile | null> {
     if (session.role === 'admin') {
         const adminDocRef = doc(db, 'admins', session.userId);
         const adminSnapshot = await getDoc(adminDocRef);
@@ -136,11 +136,7 @@ export async function getUserProfile(session: SessionPayload): Promise<UserProfi
     }
 
     // Fallback for not found user
-    return {
-        name: "Unknown User",
-        email: "",
-        avatar: "https://placehold.co/100x100.png"
-    }
+    return null;
 }
 
 

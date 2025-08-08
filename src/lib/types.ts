@@ -62,7 +62,7 @@ export type SessionPayload = {
 export type UserProfile = {
     name: string;
     email: string;
-    avatar: string;
+    avatar: string | null;
 }
 
 export type ContactMessage = {

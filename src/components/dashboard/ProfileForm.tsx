@@ -46,7 +46,7 @@ export function ProfileForm({ user, session }: ProfileFormProps) {
         resolver: zodResolver(formSchema),
         defaultValues: {
           name: user.name,
-          avatar: user.avatar.startsWith('https://placehold.co') ? '' : user.avatar,
+          avatar: user.avatar && !user.avatar.startsWith('https://placehold.co') ? user.avatar : '',
           currentPassword: "",
           newPassword: "",
           confirmPassword: "",

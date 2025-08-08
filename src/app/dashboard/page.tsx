@@ -20,6 +20,14 @@ export default async function UserDashboardPage() {
         getUserBookings(session), 
         getRooms()
     ]);
+    
+    if (!user) {
+        return (
+            <div>
+                User not found.
+            </div>
+        )
+    }
 
   return <UserDashboard user={user} userBookings={userBookings} rooms={rooms} />;
 }

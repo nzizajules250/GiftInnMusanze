@@ -12,6 +12,13 @@ export default async function ProfilePage() {
     }
 
     const user = await getUserProfile(session);
+    if (!user) {
+        return (
+            <div>
+                User not found.
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-col gap-8">
@@ -19,7 +26,7 @@ export default async function ProfilePage() {
             <Card>
                 <CardHeader className="flex flex-row items-start gap-6 space-y-0">
                     <Avatar className="w-24 h-24">
-                        <AvatarImage src={user.avatar} alt={user.name} data-ai-hint="person" />
+                        <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
                         <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex-grow">

@@ -58,7 +58,6 @@ export function UserDashboard({ user, userBookings, rooms }: UserDashboardProps)
                                                     width={100}
                                                     height={100}
                                                     className="rounded-md object-cover w-24 h-24"
-                                                    data-ai-hint={room.images?.[0]?.hint}
                                                 />
                                             )}
                                             <div className="flex-grow">
@@ -99,7 +98,7 @@ export function UserDashboard({ user, userBookings, rooms }: UserDashboardProps)
                         <Card>
                             <CardHeader className="items-center text-center">
                                 <Avatar className="w-24 h-24 mb-4">
-                                    <AvatarImage src={user.avatar} alt={user.name} data-ai-hint="person" />
+                                    <AvatarImage src={user.avatar ?? undefined} alt={user.name} />
                                     <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                                 </Avatar>
                                 <CardTitle>{user.name}</CardTitle>

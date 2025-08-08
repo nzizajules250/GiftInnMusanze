@@ -18,7 +18,6 @@ export function RoomCard({ room, isOccupied = false }: RoomCardProps) {
         <Image
           src={room.images?.[0]?.url || 'https://placehold.co/600x400.png'}
           alt={`View of ${room.name}`}
-          data-ai-hint={room.images?.[0]?.hint}
           fill
           className={cn("object-cover transition-transform duration-500 group-hover:scale-110", isOccupied && "brightness-50")}
         />

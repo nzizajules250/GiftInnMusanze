@@ -162,7 +162,7 @@ const createBookingSchema = z.object({
 });
 
 
-export async function createBookingAction(values: z.infer<typeof createBookingSchema>) {
+export async function createBookingAction(values: z.infer<typeof createBookingSchema>): Promise<{ error?: string } | void> {
     try {
         const validatedData = createBookingSchema.safeParse(values);
         if (!validatedData.success) {
