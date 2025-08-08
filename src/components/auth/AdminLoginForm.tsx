@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,9 +15,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import { adminLoginAction } from "@/lib/actions";
-import { Loader2 } from "lucide-react";
+import { Loader2, Terminal } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 const formSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
@@ -24,8 +25,8 @@ const formSchema = z.object({
 });
 
 export function AdminLoginForm() {
-  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,14 +38,11 @@ export function AdminLoginForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+    setError(null);
     const result = await adminLoginAction(values);
 
     if (result?.error) {
-        toast({
-            title: "Login Failed",
-            description: result.error,
-            variant: "destructive",
-        });
+        setError(result.error);
     }
     // On success, the action redirects, so no need to handle success case here.
 
@@ -80,6 +78,13 @@ export function AdminLoginForm() {
             </FormItem>
           )}
         />
+        {error && (
+            <Alert variant="destructive">
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Login Failed</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        )}
         <Button type="submit" className="w-full" disabled={loading}>
             {loading && <Loader2 className="animate-spin mr-2" />}
             Login as Admin

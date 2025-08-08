@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -20,10 +21,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { saveAmenityAction } from "@/lib/actions";
-import { Loader2 } from "lucide-react";
+import { Loader2, Terminal } from "lucide-react";
 import type { Amenity } from "@/lib/types";
 import { availableIcons } from "@/lib/icons";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const formSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters."),
@@ -41,6 +43,8 @@ interface ManageAmenityDialogProps {
 export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenityDialogProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: { title: "", description: "", details: "", icon: "Wifi" },
@@ -52,10 +56,11 @@ export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenit
     } else {
       form.reset({ title: "", description: "", details: "", icon: "Wifi" });
     }
-  }, [amenity, form]);
+  }, [amenity, form, isOpen]);
   
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+    setError(null);
     const result = await saveAmenityAction({ ...values, id: amenity?.id });
     if (result.success) {
       toast({
@@ -64,11 +69,7 @@ export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenit
       });
       setIsOpen(false);
     } else {
-      toast({
-        title: "Error",
-        description: result.error,
-        variant: "destructive",
-      });
+      setError(result.error || "An unexpected error occurred.");
     }
     setLoading(false);
   }
@@ -109,6 +110,13 @@ export function ManageAmenityDialog({ isOpen, setIsOpen, amenity }: ManageAmenit
                     )}/>
                 </div>
             </ScrollArea>
+             {error && (
+                <Alert variant="destructive">
+                    <Terminal className="h-4 w-4" />
+                    <AlertTitle>Save Failed</AlertTitle>
+                    <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            )}
             <DialogFooter className="pt-4 border-t flex-shrink-0">
                 <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
                 <Button type="submit" disabled={loading}>

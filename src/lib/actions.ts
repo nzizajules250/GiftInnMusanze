@@ -1,3 +1,4 @@
+
 'use server';
 
 import { z } from 'zod';
@@ -35,7 +36,7 @@ const guestLoginSchema = z.object({
   phoneNumber: z.string().min(1, 'Phone number is required.'),
 });
 
-export async function guestLoginAction(values: z.infer<typeof guestLoginSchema>) {
+export async function guestLoginAction(values: z.infer<typeof guestLoginSchema>): Promise<{ error?: string }> {
   try {
     const validatedData = guestLoginSchema.safeParse(values);
     if (!validatedData.success) {
@@ -71,7 +72,7 @@ const adminLoginSchema = z.object({
   password: z.string().min(1, 'Password is required.'),
 });
 
-export async function adminLoginAction(values: z.infer<typeof adminLoginSchema>) {
+export async function adminLoginAction(values: z.infer<typeof adminLoginSchema>): Promise<{ error?: string }> {
     try {
         const validatedData = adminLoginSchema.safeParse(values);
         if (!validatedData.success) {
@@ -112,7 +113,7 @@ const adminRegisterSchema = z.object({
 
 export async function adminRegisterAction(
   values: z.infer<typeof adminRegisterSchema>
-) {
+): Promise<{ error?: string }> {
     try {
         const validatedData = adminRegisterSchema.safeParse(values);
         if (!validatedData.success) {
@@ -210,7 +211,7 @@ const contactFormSchema = z.object({
     message: z.string().min(10, "Message must be at least 10 characters."),
 });
 
-export async function contactFormAction(values: z.infer<typeof contactFormSchema>) {
+export async function contactFormAction(values: z.infer<typeof contactFormSchema>): Promise<{ success: boolean; error?: string; }> {
     try {
         const validatedData = contactFormSchema.safeParse(values);
         if (!validatedData.success) {
@@ -252,7 +253,7 @@ const roomSchema = z.object({
   images: z.array(imageSchema).min(1, "At least one image is required."),
 });
 
-export async function saveRoomAction(roomData: z.infer<typeof roomSchema>) {
+export async function saveRoomAction(roomData: z.infer<typeof roomSchema>): Promise<{ success: boolean; error?: string; }> {
     try {
         const validatedData = roomSchema.safeParse(roomData);
         if (!validatedData.success) {
@@ -282,7 +283,7 @@ export async function deleteRoomAction(roomId: string) {
     }
 }
 
-export async function saveAmenityAction(amenityData: Omit<Amenity, 'id' | 'icon'> & { id?: string, icon: string }) {
+export async function saveAmenityAction(amenityData: Omit<Amenity, 'id' | 'icon'> & { id?: string, icon: string }): Promise<{ success: boolean; error?: string; }> {
      try {
         await saveAmenity(amenityData);
         revalidatePath('/dashboard/admin');
@@ -390,7 +391,7 @@ const profileFormSchema = z.object({
 });
 
 
-export async function updateUserProfileAction(values: z.infer<typeof profileFormSchema>) {
+export async function updateUserProfileAction(values: z.infer<typeof profileFormSchema>): Promise<{ success: boolean; error?: string; }> {
     try {
         const session = await getSession();
         if (!session) return { success: false, error: 'Unauthorized.' };
@@ -470,7 +471,7 @@ const userSettingsSchema = z.object({
   pushNotifications: z.boolean(),
 });
 
-export async function updateUserSettingsAction(values: z.infer<typeof userSettingsSchema>) {
+export async function updateUserSettingsAction(values: z.infer<typeof userSettingsSchema>): Promise<{ success: boolean; error?: string; }> {
     try {
         console.log("Updating user settings (simulated):", values);
         // In a real app, you would save these settings to the user's profile in Firebase.

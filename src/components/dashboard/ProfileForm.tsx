@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,8 +10,9 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { updateUserProfileAction } from "@/lib/actions";
-import { Loader2 } from "lucide-react";
+import { Loader2, Terminal } from "lucide-react";
 import type { SessionPayload, UserProfile } from "@/lib/types";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
@@ -40,6 +42,7 @@ interface ProfileFormProps {
 export function ProfileForm({ user, session }: ProfileFormProps) {
     const { toast } = useToast();
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
     const isGuest = session.role === 'guest';
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -55,6 +58,7 @@ export function ProfileForm({ user, session }: ProfileFormProps) {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setLoading(true);
+        setError(null);
         const result = await updateUserProfileAction(values);
         if (result.success) {
             toast({
@@ -68,11 +72,7 @@ export function ProfileForm({ user, session }: ProfileFormProps) {
                 confirmPassword: "",
             });
         } else {
-            toast({
-                title: "Error",
-                description: result.error,
-                variant: "destructive",
-            });
+            setError(result.error || "An unexpected error occurred.");
         }
         setLoading(false);
     }
@@ -163,6 +163,14 @@ export function ProfileForm({ user, session }: ProfileFormProps) {
                             />
                         </div>
                     </>
+                )}
+                
+                {error && (
+                    <Alert variant="destructive">
+                        <Terminal className="h-4 w-4" />
+                        <AlertTitle>Update Failed</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
                 )}
                 
                 <div className="pt-6 border-t">

@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -5,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { format, differenceInDays } from "date-fns"
-import { Calendar as CalendarIcon, Loader2, Info } from "lucide-react"
+import { Calendar as CalendarIcon, Loader2, Info, Terminal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -17,7 +18,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useToast } from "@/hooks/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { Calendar } from "./ui/calendar"
@@ -38,9 +38,9 @@ const formSchema = z.object({
 });
 
 export function RoomBookingForm({ room, isOccupied }: { room: Room, isOccupied?: boolean }) {
-    const { toast } = useToast()
     const [loading, setLoading] = React.useState(false);
     const [total, setTotal] = React.useState(0);
+    const [error, setError] = React.useState<string | null>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -66,6 +66,7 @@ export function RoomBookingForm({ room, isOccupied }: { room: Room, isOccupied?:
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         setLoading(true);
+        setError(null);
 
         const bookingData = {
             ...values,
@@ -77,11 +78,7 @@ export function RoomBookingForm({ room, isOccupied }: { room: Room, isOccupied?:
         const result = await createBookingAction(bookingData);
 
         if (result?.error) {
-            toast({
-                title: "Booking Failed",
-                description: result.error,
-                variant: "destructive",
-            });
+            setError(result.error);
         }
         // On success, the action redirects, so no success toast is needed here.
         setLoading(false);
@@ -166,6 +163,13 @@ export function RoomBookingForm({ room, isOccupied }: { room: Room, isOccupied?:
                         <p className="text-sm text-muted-foreground">Estimated Total</p>
                         <p className="text-2xl font-bold text-primary">${total.toFixed(2)}</p>
                     </div>
+                )}
+                 {error && (
+                    <Alert variant="destructive">
+                        <Terminal className="h-4 w-4" />
+                        <AlertTitle>Booking Failed</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
                 )}
                 <Button type="submit" className="w-full" disabled={loading}>
                     {loading && <Loader2 className="animate-spin mr-2" />}

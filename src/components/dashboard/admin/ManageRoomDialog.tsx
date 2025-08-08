@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -19,10 +20,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { generateRoomDescriptionAction, saveRoomAction } from "@/lib/actions";
-import { Loader2, PlusCircle, Sparkles, Trash2 } from "lucide-react";
+import { Loader2, PlusCircle, Sparkles, Terminal, Trash2 } from "lucide-react";
 import type { Room } from "@/lib/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
 const imageSchema = z.object({
@@ -47,6 +49,7 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -64,20 +67,24 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
   });
 
   useEffect(() => {
-    if (room) {
-      form.reset(room);
-    } else {
-      form.reset({
-        name: "",
-        description: "",
-        price: 0,
-        images: [{ url: "https://placehold.co/600x400.png", hint: "" }]
-      });
+    if (isOpen) {
+        if (room) {
+            form.reset(room);
+        } else {
+            form.reset({
+                name: "",
+                description: "",
+                price: 0,
+                images: [{ url: "https://placehold.co/600x400.png", hint: "" }]
+            });
+        }
+        setError(null);
     }
   }, [room, form, isOpen]);
   
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
+    setError(null);
     const result = await saveRoomAction({ ...values, id: room?.id });
     if (result.success) {
       toast({
@@ -86,11 +93,7 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
       });
       setIsOpen(false);
     } else {
-      toast({
-        title: "Error",
-        description: result.error,
-        variant: "destructive",
-      });
+      setError(result.error || "An unexpected error occurred.");
     }
     setLoading(false);
   }
@@ -215,6 +218,13 @@ export function ManageRoomDialog({ isOpen, setIsOpen, room }: ManageRoomDialogPr
                         </div>
                     </div>
                 </ScrollArea>
+                {error && (
+                    <Alert variant="destructive">
+                        <Terminal className="h-4 w-4" />
+                        <AlertTitle>Save Failed</AlertTitle>
+                        <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                )}
                 <DialogFooter className="pt-4 border-t flex-shrink-0">
                     <Button type="button" variant="ghost" onClick={() => setIsOpen(false)}>Cancel</Button>
                     <Button type="submit" disabled={loading}>

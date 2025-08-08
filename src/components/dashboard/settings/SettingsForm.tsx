@@ -1,3 +1,4 @@
+
 // src/components/dashboard/settings/SettingsForm.tsx
 "use client";
 
@@ -17,8 +18,9 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { updateUserSettingsAction } from "@/lib/actions";
-import { Loader2 } from "lucide-react";
+import { Loader2, Terminal } from "lucide-react";
 import { CardFooter } from "@/components/ui/card";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 const settingsSchema = z.object({
   emailNotifications: z.boolean(),
@@ -34,6 +36,7 @@ interface SettingsFormProps {
 export function SettingsForm({ userSettings }: SettingsFormProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isPushSupported, setIsPushSupported] = useState(false);
 
   useEffect(() => {
@@ -77,6 +80,7 @@ export function SettingsForm({ userSettings }: SettingsFormProps) {
 
   async function onSubmit(data: SettingsFormValues) {
     setLoading(true);
+    setError(null);
     const result = await updateUserSettingsAction(data);
 
     if (result.success) {
@@ -85,11 +89,7 @@ export function SettingsForm({ userSettings }: SettingsFormProps) {
         description: "Your notification preferences have been saved.",
       });
     } else {
-      toast({
-        title: "Update Failed",
-        description: result.error,
-        variant: "destructive",
-      });
+      setError(result.error || "An unexpected error occurred.");
     }
     setLoading(false);
   }
@@ -138,6 +138,13 @@ export function SettingsForm({ userSettings }: SettingsFormProps) {
             </FormItem>
           )}
         />
+        {error && (
+            <Alert variant="destructive">
+                <Terminal className="h-4 w-4" />
+                <AlertTitle>Update Failed</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+            </Alert>
+        )}
         <CardFooter className="p-0">
           <Button type="submit" disabled={loading}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
