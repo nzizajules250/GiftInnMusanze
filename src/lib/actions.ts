@@ -18,6 +18,7 @@ import {
   markNotificationsAsRead,
   getBookingById,
   updateUserProfile,
+  findOverlappingBookings,
 } from './firebase-service';
 import { createSession, logoutAction } from './auth';
 import bcrypt from 'bcryptjs';
@@ -172,6 +173,12 @@ export async function createBookingAction(values: z.infer<typeof createBookingSc
             ...validatedData.data,
             status: 'Pending' as const,
         }
+
+        const overlappingBookings = await findOverlappingBookings(bookingData.roomId, bookingData.checkIn, bookingData.checkOut);
+        if (overlappingBookings.length > 0) {
+            return { error: "This room is already booked for the selected dates. Please choose different dates." };
+        }
+
 
         const bookingId = await createBooking(bookingData);
 

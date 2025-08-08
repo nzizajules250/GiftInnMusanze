@@ -214,6 +214,30 @@ export async function createBooking(bookingData: NewBookingData): Promise<string
     return docRef.id;
 }
 
+export async function findOverlappingBookings(roomId: string, checkIn: Date, checkOut: Date): Promise<Booking[]> {
+    const bookingsRef = collection(db, 'bookings');
+    
+    // An overlap exists if a booking's start date is before the new checkout date,
+    // AND its end date is after the new check-in date.
+    // (startDate < newEndDate) && (endDate > newStartDate)
+    
+    const q = query(
+        bookingsRef,
+        where('roomId', '==', roomId),
+        where('status', 'in', ['Confirmed', 'Pending']),
+        where('checkIn', '<', checkOut),
+        // Firestore doesn't allow multiple range filters on different fields,
+        // so we'll have to filter the second condition in the application code.
+    );
+
+    const snapshot = await getDocs(q);
+    const bookings = snapshot.docs.map(doc => parseDocWithDateConversion<Booking>(doc));
+
+    // Filter for the second part of the overlap condition
+    return bookings.filter(booking => booking.checkOut > checkIn);
+}
+
+
 // Admin management functions
 
 export async function saveRoom(room: Omit<Room, 'id'> & { id?: string }) {
