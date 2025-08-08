@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { ThemeProvider } from "@/components/ThemeProvider";
 import { Playfair_Display, Inter } from "next/font/google";
+import { AppProviders } from "./providers";
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -42,19 +42,14 @@ export default function RootLayout({
           inter.variable
         )}
       >
-        <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-        >
+        <AppProviders>
           <div className="relative flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
             <Footer />
           </div>
           <Toaster />
-        </ThemeProvider>
+        </AppProviders>
       </body>
     </html>
   );
