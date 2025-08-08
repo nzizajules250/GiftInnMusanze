@@ -5,20 +5,21 @@ import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { Playfair_Display, Inter } from "next/font/google";
+import { Belleza, Literata } from "next/font/google";
 import { AppProviders } from "./providers";
 import { CookieConsentBanner } from "@/components/layout/CookieConsentBanner";
 
-const playfairDisplay = Playfair_Display({
+const belleza = Belleza({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-playfair-display",
+  variable: "--font-belleza",
+  weight: "400",
 });
 
-const inter = Inter({
+const literata = Literata({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-literata",
 });
 
 
@@ -40,8 +41,8 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background antialiased",
-          playfairDisplay.variable,
-          inter.variable
+          belleza.variable,
+          literata.variable
         )}
       >
         <AppProviders>
