@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -42,12 +44,12 @@ export function BookingsTab({ bookings }: { bookings: Booking[] }) {
                                 <TableCell className="text-right">${booking.total.toFixed(2)}</TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex justify-end gap-2">
-                                        <form action={updateBookingStatusAction.bind(null, booking.id, 'Confirmed')}>
+                                        <form action={async () => await updateBookingStatusAction(booking.id, 'Confirmed')}>
                                             <Button type="submit" size="sm" variant="outline" disabled={booking.status === 'Confirmed'}>
                                                 Confirm
                                             </Button>
                                         </form>
-                                        <form action={updateBookingStatusAction.bind(null, booking.id, 'Cancelled')}>
+                                        <form action={async () => await updateBookingStatusAction(booking.id, 'Cancelled')}>
                                             <Button type="submit" size="sm" variant="destructive" disabled={booking.status === 'Cancelled'}>
                                                 Cancel
                                             </Button>
